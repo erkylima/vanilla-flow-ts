@@ -1,4 +1,4 @@
-import FlowChart, { EdgeProps, NodeProps } from "./components/Board";
+import FlowChart, { BoardEdgeProps, BoardNodeProps } from "./components/Board";
 import styles from "./style.module.css"
 
 const initialNodes = [
@@ -75,12 +75,12 @@ const initialEdges = [
 ];
 
 export default class AppRoot extends HTMLElement {
-    nodes:NodeProps[];
-    setNodes(nodes:NodeProps[]){
+    nodes:BoardNodeProps[];
+    setNodes(nodes:BoardNodeProps[]){
         this.nodes = nodes;
     }
-    edges:EdgeProps[];
-    setEdges(edges:EdgeProps[]){
+    edges:BoardEdgeProps[];
+    setEdges(edges:BoardEdgeProps[]){
         this.edges = edges;
     }
     constructor(){
@@ -95,10 +95,10 @@ export default class AppRoot extends HTMLElement {
         const flowchart = new FlowChart({
             nodes: this.nodes,
             edges: this.edges,
-            onNodesChange: (newNodes: NodeProps[]) => {
+            onNodesChange: (newNodes: BoardNodeProps[]) => {
                 this.setNodes(newNodes);
             },
-            onEdgesChange: (newEdges: EdgeProps[]) => {
+            onEdgesChange: (newEdges: BoardEdgeProps[]) => {
                 this.setEdges(newEdges);
             }
         })

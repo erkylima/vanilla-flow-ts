@@ -43,17 +43,15 @@ export default class NodesBoard extends HTMLElement {
     }
     constructor(props: Props) {
         super();        
-        this.props = props;
+        this.props = props;        
         var scene = document.createElement('div')
         scene.addEventListener('mousemove', (ev) => this.handleOnMouseMoveScene(ev, scene))
-        scene.addEventListener('mouseup',  this.handleOnMouseUpScene)
+        scene.addEventListener('mouseup', (ev) => this.handleOnMouseUpScene(ev, props))
         this.className = styles.main
         this.render(scene);
     }
 
     render(scene: HTMLElement): void {
-        alert(scene.getBoundingClientRect().x)
-
         this.props.nodes.forEach((node, index) => {
             var props: NodeComponentProps = {
                 id: node.id,
@@ -65,9 +63,10 @@ export default class NodesBoard extends HTMLElement {
                 inputs:node.inputs,
                 outputs:node.outputs,
                 onMouseDown: (event: MouseEvent) => {
-                    this.handleOnMouseDownNode(index, event.x, event.y)                    
+                    this.handleOnMouseDownNode(index, event.x, event.y, this.props, scene)
                 },
                 onNodeMount: (inputs: { offset: { x: number; y: number } }[], outputs: { offset: { x: number; y: number } }[]) =>
+                    
                     this.props.onNodeMount({                            
                         nodeIndex: index,
                         inputs: inputs.map((values: { offset: { x: number; y: number } }) => {     
@@ -103,28 +102,28 @@ export default class NodesBoard extends HTMLElement {
         })
         this.appendChild(scene)
         this.scene = scene;
-        alert(this.scene)
     }
     handleOnMouseMoveScene(event: any, scene:HTMLElement) {
-        const x = event.x - this.scene.getBoundingClientRect().x;
-        const y = event.y - this.scene.getBoundingClientRect().y;
+        const x = event.x - scene.getBoundingClientRect().x;
+        const y = event.y - scene.getBoundingClientRect().y;
         if (this.grabbing !== null) {
             this.props.onNodeMove(this.grabbing || 0, x, y);
         }
+        
         this.props.onMouseMove(x, y);
     }
 
-    handleOnMouseUpScene(event: any) {
+    handleOnMouseUpScene(event: any, props:Props) {
         this.setGrabbing = null;
-        this.props.onMouseUp();
+        props.onMouseUp();
     }
 
-    handleOnMouseDownNode(index: number, x: number, y: number) {
+    handleOnMouseDownNode(index: number, x: number, y: number, props:Props, scene: HTMLElement) {
         this.setGrabbing = index;
         this.setSelected =index;
-        this.props.onNodePress(
-            x - this.scene.getBoundingClientRect().x - this.props.nodesPositions[index].x,
-            y - this.scene.getBoundingClientRect().y - this.props.nodesPositions[index].y
+        props.onNodePress(
+            x - scene.getBoundingClientRect().x - props.nodesPositions[index].x,
+            y - scene.getBoundingClientRect().y - props.nodesPositions[index].y
         );
     }
 };
