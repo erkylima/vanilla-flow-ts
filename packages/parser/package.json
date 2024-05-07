@@ -1,0 +1,13 @@
+{
+  "name": "@tsx/parser",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "build": "tsc && rspack build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

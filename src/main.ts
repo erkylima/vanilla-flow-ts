@@ -1,7 +1,7 @@
-import styles from "./style.module.css"
 
-window.onload = () => {
-    var e = document.createElement("div");
-    e.className = styles.container;
-    document.getElementById("root")?.append(e)
+import AppRoot from "./app";
+import './app.css'
+window.onload = function() {
+    var app = new AppRoot();
+    document.getElementById("root")?.appendChild(app);
 }

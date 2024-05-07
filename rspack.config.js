@@ -2,6 +2,7 @@ const rspack = require("@rspack/core");
 /**
  * @type {import('@rspack/cli').Configuration}
  */
+const path = require("path");
 
 module.exports = {
 	context: __dirname,
@@ -9,10 +10,10 @@ module.exports = {
 	  main: './src/main.ts',
 	},
 	mode:'development',
-	resolve: {
-		extensions: ["...", ".ts", ".jsx",".css"]
-	},
 	devtool: "source-map",
+	resolve: {
+		extensions: ["...", ".ts", ".tsx", ".jsx",".css"]
+	},
 	devServer: {
 		hot: false,
 		
@@ -39,6 +40,24 @@ module.exports = {
 		  	},
 		  	type: 'css/module',
 			},
+			{
+				test: /\.ts$/,
+				use: [
+					{
+						loader: 'builtin:swc-loader',
+						/**
+						 * @type {import('@rspack/core').SwcLoaderOptions}
+						 */
+						options: {
+							jsc: {
+								parser:{
+									syntax: 'typescript'
+								}
+							}
+						}
+					}
+				]
+			}
 	  	],
 	},
 	plugins: [
