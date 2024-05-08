@@ -53,6 +53,7 @@ export default class NodesBoard extends HTMLElement {
     }
 
     render(scene: HTMLElement): void {
+        
         this.props.nodes.forEach((node, index) => {
             var props: NodeComponentProps = {
                 id: node.id,
@@ -63,6 +64,27 @@ export default class NodesBoard extends HTMLElement {
                 content:node.data.content,
                 inputs:node.inputs,
                 outputs:node.outputs,
+                onNodeMount: (inputs: { offset: { x: number; y: number } }[], outputs: { offset: { x: number; y: number } }[]) =>
+                    this.props.onNodeMount({                            
+                        nodeIndex: index,
+                        inputs: inputs.map((values: { offset: { x: number; y: number } }) => {     
+                            
+                            return {
+                                offset: {
+                                    x: values.offset.x - scene.getBoundingClientRect().x - this.props.nodesPositions[index].x + 6,
+                                    y: values.offset.y - scene.getBoundingClientRect().y - this.props.nodesPositions[index].y + 6,
+                                },
+                            };
+                        }),
+                        outputs: outputs.map((values: { offset: { x: number; y: number } }) => {
+                            return {
+                                offset: {
+                                    x: values.offset.x - scene.getBoundingClientRect().x - this.props.nodesPositions[index].x + 6,
+                                    y: values.offset.y - scene.getBoundingClientRect().y - this.props.nodesPositions[index].y + 6,
+                                },
+                            };
+                        }),
+                }),
                 onMouseDown: (event: MouseEvent):Position => {
                     return this.handleOnMouseDownNode(index, event.x, event.y, this.props, scene)
                 },

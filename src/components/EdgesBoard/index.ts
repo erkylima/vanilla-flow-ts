@@ -1,5 +1,5 @@
 import EdgeComponent, { EdgeComponentProps } from "../EdgeComponent";
-
+import styles from "./styles.module.css";
 export interface Vector {
     x0: number;
     y0: number;
@@ -35,35 +35,25 @@ export class EdgesBoard extends HTMLElement {
         super();
         this.props = props;
         if(this.props){
-            this.connectedCallback()
+            var newIds = Object.keys(this.props.edgesActives).filter((elem:string) => this.props.edgesActives[elem]);
+            this.setIds = newIds;
+            if (this.selected !== "null" && this.props.newEdge !== null){ 
+    
+                this.setSelected = "null";
+    
+            }
             this.render();
-        }
-    }
-    connectedCallback() {
-        
-        var newIds = Object.keys(this.props.edgesActives);
-        var ids = []
-        newIds.forEach(element => {
-            alert(element)
-        });
-        this.setIds = newIds;
-
-        if (this.selected !== "null" && this.props.newEdge !== null){ 
-
-            this.setSelected = "null";
-
         }
     }
 
     render() {
-        var svg = document.createElement('svg')
-        svg.className = "edgeMain"
+        let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("class", styles.main);
 
         this.ids.forEach((edgeId: string) => {
             if (this.props.edgesActives[edgeId])
                 var props: EdgeComponentProps = {
-                    selected: this.selected === edgeId,          
-                                      
+                    selected: this.selected === edgeId,
                     position: {
                         x0: this.props.edgesPositions[edgeId]?.x0 || 0,
                         y0: this.props.edgesPositions[edgeId]?.y0 || 0,
@@ -84,13 +74,13 @@ export class EdgesBoard extends HTMLElement {
 
                 };
                 const edge = new EdgeComponent(props)
-                svg.appendChild(edge);
-            
+                svg.append(edge.getPath())
+                
         });
         if (this.props.newEdge !== null) {
             
             var props: EdgeComponentProps = {
-                selected: false,                            
+                selected: false,                      
                 position: {
                     x0: this.props.newEdge.position.x0,
                     y0: this.props.newEdge.position.y0,
@@ -107,11 +97,9 @@ export class EdgesBoard extends HTMLElement {
 
             };
             const edge = new EdgeComponent(props)
-            svg.append(edge);
-        }
-
+            svg.append(edge.getPath());
+        }        
         this.append(svg)
-        
         
     }
 }    

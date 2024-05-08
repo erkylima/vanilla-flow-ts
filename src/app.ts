@@ -1,5 +1,4 @@
 import FlowChart, { BoardEdgeProps, BoardNodeProps } from "./components/Board";
-import styles from "./style.module.css"
 
 const initialNodes = [
     {
@@ -42,6 +41,7 @@ const initialNodes = [
         outputs: 0,
     },
 ];
+
 const initialEdges = [
     {
         id: "edge_0:0_1:0",

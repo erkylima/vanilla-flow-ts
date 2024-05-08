@@ -13,7 +13,8 @@ export interface NodeComponentProps {
     label?: string;
     content: any;
     inputs: number;
-    outputs: number;    
+    outputs: number;  
+    onNodeMount?: (inputs: { offset: { x: number; y: number } }[], outputs: { offset: { x: number; y: number } }[]) => void;  
     onMouseDown?: (event: any) => Position;
     onMouseUp?: (event: any) => void;
     onMouseDownOutput?: (outputIndex: number) => void;
@@ -35,6 +36,16 @@ export default class NodeComponent extends HTMLElement {
 
             this.props = props;
 
+            let inputs: { offset: { x: number; y: number } }[] = [];
+            let outputs: { offset: { x: number; y: number } }[] = [];
+            for (let i = 0; i < this.props.inputs; i++) {                
+                inputs.push({ offset: { x: this.props.x, y: this.props.y } });
+            }
+            
+            for (let i = 0; i < this.props.outputs; i++) {
+                outputs.push({ offset: { x: this.props.x, y: this.props.y } });
+            }
+            props.onNodeMount(inputs, outputs);
 
             this.render()
         }

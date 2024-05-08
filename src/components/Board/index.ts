@@ -266,7 +266,7 @@ class FlowChart extends HTMLElement{
         }
     }
 
-    render(){
+    render() {
             var main = this.mainElement()
             var wrapper = this.wrapperElement()
             var content = this.contentElement()
@@ -274,9 +274,7 @@ class FlowChart extends HTMLElement{
             content.appendChild(this.edgesBoard)
             wrapper.append(content)
             main.append(wrapper)
-            this.append(main)
-
-        
+            this.append(main)    
     }    
 
 
