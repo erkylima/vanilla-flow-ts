@@ -1,3 +1,4 @@
+import { Position } from "../Board";
 import NodeComponent, { NodeComponentProps } from "../NodeComponent";
 import styles from "./styles.module.css";
 
@@ -62,30 +63,12 @@ export default class NodesBoard extends HTMLElement {
                 content:node.data.content,
                 inputs:node.inputs,
                 outputs:node.outputs,
-                onMouseDown: (event: MouseEvent) => {
-                    this.handleOnMouseDownNode(index, event.x, event.y, this.props, scene)
+                onMouseDown: (event: MouseEvent):Position => {
+                    return this.handleOnMouseDownNode(index, event.x, event.y, this.props, scene)
                 },
-                onNodeMount: (inputs: { offset: { x: number; y: number } }[], outputs: { offset: { x: number; y: number } }[]) =>
-                    
-                    this.props.onNodeMount({                            
-                        nodeIndex: index,
-                        inputs: inputs.map((values: { offset: { x: number; y: number } }) => {     
-                            return {
-                                offset: {
-                                    x: values.offset.x - scene.getBoundingClientRect().x - this.props.nodesPositions[index].x + 6,
-                                    y: values.offset.y - scene.getBoundingClientRect().y - this.props.nodesPositions[index].y + 6,
-                                },
-                            };
-                        }),
-                        outputs: outputs.map((values: { offset: { x: number; y: number } }) => {
-                            return {
-                                offset: {
-                                    x: values.offset.x - scene.getBoundingClientRect().x - this.props.nodesPositions[index].x + 6,
-                                    y: values.offset.y - scene.getBoundingClientRect().y - this.props.nodesPositions[index].y + 6,
-                                },
-                            };
-                        }),
-                }),
+                onMouseUp: (event: MouseEvent) => {
+                    this.handleOnMouseUpScene(event, this.props)
+                },
                 onMouseDownOutput: (outputIndex: number) => this.props.onOutputMouseDown(index, outputIndex),
                 onMouseUpInput: (inputIndex: number) => this.props.onInputMouseUp(index, inputIndex),
                 onClickOutside: () => {
@@ -104,6 +87,7 @@ export default class NodesBoard extends HTMLElement {
         this.scene = scene;
     }
     handleOnMouseMoveScene(event: any, scene:HTMLElement) {
+        if (this.selected != null) {
         const x = event.x - scene.getBoundingClientRect().x;
         const y = event.y - scene.getBoundingClientRect().y;
         if (this.grabbing !== null) {
@@ -112,19 +96,24 @@ export default class NodesBoard extends HTMLElement {
         
         this.props.onMouseMove(x, y);
     }
+    }
 
     handleOnMouseUpScene(event: any, props:Props) {
         this.setGrabbing = null;
+
+        this.setSelected = null;
         props.onMouseUp();
     }
 
-    handleOnMouseDownNode(index: number, x: number, y: number, props:Props, scene: HTMLElement) {
+    handleOnMouseDownNode(index: number, x: number, y: number, props:Props, scene: HTMLElement):Position {
         this.setGrabbing = index;
-        this.setSelected =index;
+        this.setSelected = index;
         props.onNodePress(
             x - scene.getBoundingClientRect().x - props.nodesPositions[index].x,
             y - scene.getBoundingClientRect().y - props.nodesPositions[index].y
         );
+        props.onNodeMove(index, x, y);
+        return {x:x, y:y}
     }
 };
 

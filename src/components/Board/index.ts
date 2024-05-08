@@ -226,12 +226,12 @@ class FlowChart extends HTMLElement{
                 nodesPositions:this.nodesPositions,
                 nodes:this.nodesData,
                 onNodeMount:((values) => this.handleOnNodeMount(values)),
-                onNodePress:((deltaX, deltaY) => this.handleOnNodePress(deltaX, deltaY, this.clickedDelta)),
-                onNodeMove:((nodeIndex, x, y) => this.handleOnNodeMove(nodeIndex, x, y, this.clickedDelta)),
+                onNodePress:((deltaX, deltaY) => this.handleOnNodePress(deltaX, deltaY)),
+                onNodeMove:((nodeIndex, x, y) => this.handleOnNodeMove(nodeIndex, x, y)),
                 onNodeDelete:((nodeId) => this.handleOnNodeDelete(nodeId)),
                 onOutputMouseDown:((nodeIndex, outputNode) => this.handleOnOutputMouseDown(nodeIndex, outputNode)),
                 onInputMouseUp:((nodeIndex, InputNode) => this.handleOnInputMouseUp(nodeIndex, InputNode)),
-                onMouseUp: this.handleOnMouseUp,
+                onMouseUp: (() => this.handleOnMouseUp()),
                 onMouseMove:this.handleOnMouseMove            
             }); 
             return nodesBoard
@@ -333,20 +333,25 @@ class FlowChart extends HTMLElement{
         this.setEdgesPositions = edgesPositions(this.edgesPositions);
     }
 
-    handleOnNodePress(deltaX: number, deltaY: number, clickedDelta: Position) {
-        clickedDelta = { x: deltaX, y: deltaY };
-        
+    handleOnNodePress(deltaX: number, deltaY: number) {
+        this.clickedDelta = { x: deltaX, y: deltaY };
+
     }
 
-    handleOnNodeMove(nodeIndex: number, x: number, y: number, clickedDelta: Position) {
-        const prev = ():Position[] => {
-            const next = [...this.nodesPositions];
-            next[nodeIndex].x = x - clickedDelta.x;
-            next[nodeIndex].y = y - clickedDelta.y;
+    handleOnNodeMove(nodeIndex: number, x: number, y: number) {
+        const prev = (prev:Position[]) => {
+            const next:Position[] = [...prev];
+            next[nodeIndex].x = x - this.clickedDelta.x;
+            next[nodeIndex].y = y - this.clickedDelta.y;
             return next;
         }
-        this.setNodesPositions = prev();
-
+        
+        var prevNode = prev(this.nodesPositions);
+        this.setNodesPositions = prevNode;
+        const node = document.getElementById("node-" + (nodeIndex +1));
+        
+        node.style.transform = `translate(${x - this.clickedDelta.x}px, ${y - this.clickedDelta.y}px)`
+        
         const edgesPositions = (prev: EdgesPositions) => {
             const next = { ...prev };
             this.nodesData[nodeIndex].edgesIn.map((edgeId: string) => {
@@ -370,6 +375,8 @@ class FlowChart extends HTMLElement{
             return next;
         }
         this.setEdgesPositions = edgesPositions(this.edgesPositions);
+
+
     }
 
     handleOnNodeDelete(nodeId: string) {
@@ -466,6 +473,7 @@ class FlowChart extends HTMLElement{
     }
 
     handleOnMouseUp() {
+        
         this.setNewEdge = null;
     }
 

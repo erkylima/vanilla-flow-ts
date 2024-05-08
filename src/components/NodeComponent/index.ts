@@ -1,5 +1,8 @@
 import styles from "./styles.module.css";
-
+interface Position {
+    x: number;
+    y: number;
+}
 export interface NodeComponentProps {
     ref?: any;
     id?: string;
@@ -10,9 +13,9 @@ export interface NodeComponentProps {
     label?: string;
     content: any;
     inputs: number;
-    outputs: number;
-    onNodeMount?: (inputs: { offset: { x: number; y: number } }[], outputs: { offset: { x: number; y: number } }[]) => void;
-    onMouseDown?: (event: any) => void;
+    outputs: number;    
+    onMouseDown?: (event: any) => Position;
+    onMouseUp?: (event: any) => void;
     onMouseDownOutput?: (outputIndex: number) => void;
     onMouseUpInput?: (inputIndex: number) => void;
     onClickOutside?: () => void;
@@ -37,7 +40,7 @@ export default class NodeComponent extends HTMLElement {
     }
 
 
-    render() {
+    render() {        
         if (this.props.content == "Only Inputs"){
             alert("check");
         }
@@ -52,33 +55,37 @@ export default class NodeComponent extends HTMLElement {
 
 
     populateInputPoints(lenght:number, props): HTMLElement[] {
-        var elements: HTMLElement[] = [];
-        for (let i = 0; i < lenght; i++) {
-            var element = document.createElement("div");
-            element.className = styles.nodeInput
-            element.addEventListener("mousedown", function(e) {
-                e.stopPropagation();
-            })
-            element.addEventListener("mouseup", function(e) {
-            if (props.onMouseUpInput) props.onMouseUpInput(i);
-            })
-            elements.push(element)
+        if (props){
+            var elements: HTMLElement[] = [];
+            for (let i = 0; i < lenght; i++) {
+                var element = document.createElement("div");
+                element.className = styles.nodeInput
+                element.addEventListener("mousedown", function(e) {
+                    e.stopPropagation();
+                })
+                element.addEventListener("mouseup", function(e) {
+                })
+                
+                elements.push(element)
+            }
+            return elements
         }
-        return elements
     }
     populateOutputPoints(lenght:number, props:NodeComponentProps): HTMLElement[] {
         var elements: HTMLElement[] = [];
-        for (let i = 0; i < lenght; i++) {
-            var element = document.createElement("div");
-            element.className = styles.nodeInput
-            
-            element.addEventListener("mousedown", function(e) {
-                e.stopPropagation();
-            })
-            
-            elements.push(element)
+        if (props){
+            for (let i = 0; i < lenght; i++) {
+                var element = document.createElement("div");
+                element.className = styles.nodeInput
+                
+                element.addEventListener("mousedown", function(e) {
+                    e.stopPropagation();
+                })
+                
+                elements.push(element)
+            }
+            return elements
         }
-        return elements
     }
 
     clickOutside(el, accessor) {
@@ -130,9 +137,16 @@ export default class NodeComponent extends HTMLElement {
 
     nodeElement() {
         var drawer = document.createElement("div");
+        drawer.id = this.props.id
         drawer.className = this.props.selected ? styles.nodeSelected : styles.node
         drawer.style.transform = `translate(${this.props.x}px, ${this.props.y}px)`
-        drawer.addEventListener("mousedown", this.props.onMouseDown)        
+        drawer.addEventListener("mousedown", ((ev) => {
+            this.props.onMouseDown(ev)
+        }));
+        drawer.addEventListener("mouseup", ((ev) => {
+            this.props.onMouseUp(ev)
+        }));
+
         return drawer
     }
 
