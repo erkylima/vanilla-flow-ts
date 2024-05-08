@@ -384,6 +384,7 @@ class FlowChart extends HTMLElement{
         const newEdges = this.props.edges.filter((edge: BoardEdgeProps) => edge.sourceNode !== nodeId && edge.targetNode !== nodeId);
         this.props.onEdgesChange(newEdges);
         this.props.onNodesChange(newNodes);
+        document.getElementById(nodeId).remove();
 
     }
 

@@ -50,7 +50,7 @@ export default class EdgeComponent extends HTMLElement {
             path.onclick = this.props.onClickEdge;
             
            
-            this.innerHTML = path.outerHTML
+            this.append(path)
 
         }
     }

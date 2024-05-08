@@ -23,11 +23,11 @@ interface EdgeBoardProps {
 }
 export class EdgesBoard extends HTMLElement {
     ids: string[] = []
-    setIds(ids: string[]){
+    set setIds(ids: string[]){
         this.ids = ids;
     }
     selected: string = "null";
-    setSelected(id: string){
+    set setSelected(id: string){
         this.selected = id;
     }
     props: EdgeBoardProps
@@ -35,26 +35,28 @@ export class EdgesBoard extends HTMLElement {
         super();
         this.props = props;
         if(this.props){
-            this.connectedCallback()
+            this.connectedCallback();
+            this.render();
         }
     }
 
     connectedCallback() {
-        
+
         const newIds = Object.keys(this.props.edgesActives).filter((elem: string) => this.props.edgesActives[elem]);
 
-        this.setIds(newIds);
+        this.setIds = newIds;
 
         if (this.selected !== "null" && this.props.newEdge !== null){ 
 
-            this.setSelected("null");
+            this.setSelected = "null";
 
         }
-        this.render()
     }
 
     render() {
-        var edgePoints = ``
+        var svg = document.createElement('svg')
+        svg.className = "edgeMain"
+
         this.ids.forEach((edgeId: string) => {
             if (this.props.edgesActives[edgeId])
                 var props: EdgeComponentProps = {
@@ -74,13 +76,13 @@ export class EdgesBoard extends HTMLElement {
 
                     },
                     onClickEdge: () => {
-                        this.setSelected(edgeId);
+                        this.setSelected = edgeId;
 
                     }
 
                 };
                 const edge = new EdgeComponent(props)
-                edgePoints += edge.innerHTML
+                svg.appendChild(edge);
             
         });
         if (this.props.newEdge !== null) {
@@ -103,14 +105,11 @@ export class EdgesBoard extends HTMLElement {
 
             };
             const edge = new EdgeComponent(props)
-            edgePoints += edge.innerHTML
+            svg.append(edge);
         }
 
-        this.innerHTML = `
-        <svg class="edgeMain">            
-            ${edgePoints}            
-        </svg>
-        `
+        this.append(svg)
+        
         
     }
 }    

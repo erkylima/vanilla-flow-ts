@@ -69,6 +69,7 @@ export default class NodesBoard extends HTMLElement {
                 onMouseUp: (event: MouseEvent) => {
                     this.handleOnMouseUpScene(event, this.props)
                 },
+                
                 onMouseDownOutput: (outputIndex: number) => this.props.onOutputMouseDown(index, outputIndex),
                 onMouseUpInput: (inputIndex: number) => this.props.onInputMouseUp(index, inputIndex),
                 onClickOutside: () => {
