@@ -8,14 +8,14 @@ export interface Position {
     y: number;
 }
 
-export interface Vector {
+interface Vector {
     x0: number;
     y0: number;
     x1: number;
     y1: number;
 }
 
-export interface NodeData {
+interface NodeData {
     id: string;
     data: { label?: string; content: any };
     inputs: number;
@@ -24,7 +24,7 @@ export interface NodeData {
     edgesOut: string[];
 }
 
-export interface EdgesNodes {
+interface EdgesNodes {
     [id: string]: { outNodeId: string; outputIndex: number; inNodeId: string; inputIndex: number };
 }
 
@@ -136,6 +136,10 @@ function getInitialNodes(
 }
 
 class FlowChart extends HTMLElement{
+
+    props : BoardProps;
+    edgesBoard: EdgesBoard;
+    nodesBoard: NodesBoard;
     // EDGES
     edgesNodes: EdgesNodes
     set setEdgeNodes(edgesNodes: EdgesNodes) {
@@ -149,7 +153,6 @@ class FlowChart extends HTMLElement{
     set setEdgesActive(edgesActive: EdgesActive) {
         this.edgesActive = edgesActive;
     }
-    props : BoardProps
 
     // NODES
     nodesPositions: Position[]
@@ -183,7 +186,8 @@ class FlowChart extends HTMLElement{
     constructor(props: BoardProps) {
         super();
         this.props = props;
-        if (this.props){
+        if (this.props != undefined){
+            
             const { initEdgesNodes, initEdgesPositions, initEdgesActives } = getInitialEdges(this.props.nodes);
             
             this.setEdgeNodes = initEdgesNodes;
@@ -196,6 +200,29 @@ class FlowChart extends HTMLElement{
             this.setNodesOffsets = initNodesOffsets;
             this.clickedDelta = { x: 0, y: 0 };
             this.newEdge = null;
+
+            const nodesBoard = new NodesBoard({
+                nodesPositions:this.nodesPositions,
+                nodes:this.nodesData,
+                onNodeMount:((values) => this.handleOnNodeMount(values)),
+                onNodePress:((deltaX, deltaY) => this.handleOnNodePress(deltaX, deltaY)),
+                onNodeMove:((nodeIndex, x, y) => this.handleOnNodeMove(nodeIndex, x, y)),
+                onNodeDelete:((nodeId) => this.handleOnNodeDelete(nodeId)),
+                onOutputMouseDown:((nodeIndex, outputNode) => this.handleOnOutputMouseDown(nodeIndex, outputNode)),
+                onInputMouseUp:((nodeIndex, InputNode) => this.handleOnInputMouseUp(nodeIndex, InputNode)),
+                onMouseUp: (() => this.handleOnMouseUp()),
+                onMouseMove:this.handleOnMouseMove            
+            }); 
+            this.nodesBoard = nodesBoard;
+
+            const edgesBoard = new EdgesBoard({
+                newEdge:this.newEdge,
+                edgesActives:this.edgesActive,
+                edgesPositions:this.edgesPositions,
+                onDeleteEdge: ((e) => this.handleOnDeleteEdge(e))
+                
+            });
+            this.edgesBoard = edgesBoard
             this.render();
         }
     }
@@ -220,51 +247,31 @@ class FlowChart extends HTMLElement{
         return drawer
     }
 
-    nodesBoard():HTMLElement {
-        if (this.nodesBoard){
-            var nodesBoard = new NodesBoard({
-                nodesPositions:this.nodesPositions,
-                nodes:this.nodesData,
-                onNodeMount:((values) => this.handleOnNodeMount(values)),
-                onNodePress:((deltaX, deltaY) => this.handleOnNodePress(deltaX, deltaY)),
-                onNodeMove:((nodeIndex, x, y) => this.handleOnNodeMove(nodeIndex, x, y)),
-                onNodeDelete:((nodeId) => this.handleOnNodeDelete(nodeId)),
-                onOutputMouseDown:((nodeIndex, outputNode) => this.handleOnOutputMouseDown(nodeIndex, outputNode)),
-                onInputMouseUp:((nodeIndex, InputNode) => this.handleOnInputMouseUp(nodeIndex, InputNode)),
-                onMouseUp: (() => this.handleOnMouseUp()),
-                onMouseMove:this.handleOnMouseMove            
-            }); 
-            return nodesBoard
-        } else {
-            alert("Please insert a valid node")
-            return document.createElement("div")            
-        }
-    }
 
-    edgesBoard():HTMLElement{
-        if (this.nodesBoard){
-            var edgesBoard = new EdgesBoard({
-                newEdge:this.newEdge,
-                edgesActives:this.edgesActive,
-                edgesPositions:this.edgesPositions,
-                onDeleteEdge: ((e) => this.handleOnDeleteEdge(e))
-                
-            });
-            return edgesBoard;
-        } else {
-            alert("Please insert a valid edge")
-            return document.createElement("div")            
+    connectedCallback() {
+        if (this.props != undefined) {
+            const nextNodesLength = this.props.nodes.length;
+            const prevNodesLength = this.nodesData.length;      
+            
+            if (nextNodesLength !== prevNodesLength) {
+                const { initEdgesNodes, initEdgesPositions, initEdgesActives } = getInitialEdges(this.props.nodes);
+                this.setEdgeNodes = initEdgesNodes;
+                this.setEdgesPositions = initEdgesPositions;
+                this.setEdgesActive = initEdgesActives;
+                const { initNodesPositions, initNodesData, initNodesOffsets } = getInitialNodes(this.props.nodes, this.props.edges);
+                this.setNodesPositions = initNodesPositions;
+                this.setNodesData =initNodesData;
+                this.setNodesOffsets = initNodesOffsets;
+            }
         }
     }
 
     render(){
-            var nodesBoard = this.nodesBoard()
-            var edgesBoard = this.edgesBoard()
             var main = this.mainElement()
             var wrapper = this.wrapperElement()
             var content = this.contentElement()
-            content.appendChild(nodesBoard)
-            content.appendChild(edgesBoard)
+            content.appendChild(this.nodesBoard)
+            content.appendChild(this.edgesBoard)
             wrapper.append(content)
             main.append(wrapper)
             this.append(main)

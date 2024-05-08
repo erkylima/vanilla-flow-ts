@@ -42,7 +42,6 @@ const initialNodes = [
         outputs: 0,
     },
 ];
-
 const initialEdges = [
     {
         id: "edge_0:0_1:0",
@@ -76,17 +75,17 @@ const initialEdges = [
 
 export default class AppRoot extends HTMLElement {
     nodes:BoardNodeProps[];
-    setNodes(nodes:BoardNodeProps[]){
+    set setNodes(nodes:BoardNodeProps[]){
         this.nodes = nodes;
     }
     edges:BoardEdgeProps[];
-    setEdges(edges:BoardEdgeProps[]){
+    set setEdges(edges:BoardEdgeProps[]){
         this.edges = edges;
     }
     constructor(){
         super();   
-        this.setNodes(initialNodes);
-        this.setEdges(initialEdges);
+        this.setNodes = initialNodes;
+        this.setEdges = initialEdges;
         this.render();
     }
 
@@ -96,10 +95,10 @@ export default class AppRoot extends HTMLElement {
             nodes: this.nodes,
             edges: this.edges,
             onNodesChange: (newNodes: BoardNodeProps[]) => {
-                this.setNodes(newNodes);
+                this.setNodes =newNodes;
             },
             onEdgesChange: (newEdges: BoardEdgeProps[]) => {
-                this.setEdges(newEdges);
+                this.setEdges = newEdges;
             }
         })
         // var node = new NodeComponent({

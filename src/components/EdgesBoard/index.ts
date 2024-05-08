@@ -35,15 +35,17 @@ export class EdgesBoard extends HTMLElement {
         super();
         this.props = props;
         if(this.props){
-            this.connectedCallback();
+            this.connectedCallback()
             this.render();
         }
     }
-
     connectedCallback() {
-
-        const newIds = Object.keys(this.props.edgesActives).filter((elem: string) => this.props.edgesActives[elem]);
-
+        
+        var newIds = Object.keys(this.props.edgesActives);
+        var ids = []
+        newIds.forEach(element => {
+            alert(element)
+        });
         this.setIds = newIds;
 
         if (this.selected !== "null" && this.props.newEdge !== null){ 
