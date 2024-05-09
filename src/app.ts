@@ -24,7 +24,7 @@ const initialNodes = [
         id: "node-3",
         position: { x: 350, y: 300 },
         data: {
-            content: "This is a node with two inputs and two outputs",
+            content: "two inputs, two outputs",
         },
         inputs: 2,
         outputs: 2,

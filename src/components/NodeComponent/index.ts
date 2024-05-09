@@ -1,8 +1,10 @@
 import styles from "./styles.module.css";
+
 interface Position {
     x: number;
     y: number;
 }
+
 export interface NodeComponentProps {
     ref?: any;
     id?: string;
@@ -23,10 +25,17 @@ export interface NodeComponentProps {
     onClickDelete?: () => void;
 }
 
+
 export default class NodeComponent extends HTMLElement {
-    props: NodeComponentProps
+    
+    props: NodeComponentProps = null
+
     inputRefs: HTMLElement[]
     outputRefs: HTMLElement[]
+    inputs: { offset: { x: number; y: number } }[] = []
+    outputs: { offset: { x: number; y: number } }[] = []
+    static observedAttributes = ["inputRefs", "outputRefs"];
+
     constructor(props: NodeComponentProps) {
         super();
         if (props){
@@ -34,44 +43,57 @@ export default class NodeComponent extends HTMLElement {
         
             this.outputRefs = this.populateOutputPoints(props.outputs, props);
 
-            this.props = props;
-
-            let inputs: { offset: { x: number; y: number } }[] = [];
-            let outputs: { offset: { x: number; y: number } }[] = [];
-            for (let i = 0; i < this.props.inputs; i++) {                
-                inputs.push({ offset: { x: this.props.x, y: this.props.y } });
-            }
             
-            for (let i = 0; i < this.props.outputs; i++) {
-                outputs.push({ offset: { x: this.props.x, y: this.props.y } });
-            }
-            props.onNodeMount(inputs, outputs);
-
+            this.props = props;       
+                 
             this.render()
         }
     }
 
-
-    render() {        
-        if (this.props.content == "Only Inputs"){
-            alert("check");
+    connectedCallback() {
+        try {
+            this.querySelector(`#${this.props.id}`).append(this.inputsElement());
+            this.querySelector(`#${this.props.id}`).append(this.outputsElement());
+            for (let i = 0; i < this.inputRefs.length; i++) {  
+                // alert(JSON.stringify({ offset: { x: this.querySelector(`#input-${(i+1)}-${this.props.id}`).getBoundingClientRect().x, y: this.querySelector(`#input-${(i+1)}-${this.props.id}`).getBoundingClientRect().y } }))                
+            }
+            
         }
+        catch{}
+    }
+    attributeChangedCallback(name: any, oldValue: any, newValue: any) {
+        console.log(
+          `Attribute ${name} has changed from ${oldValue} to ${newValue}.`,
+        );
+      }
+    
+    render() {        
+        
         const node = this.nodeElement()
         node.append(this.deleteElement())
         node.append(this.labelElement())
-        node.append(this.contentElement())
-        node.append(this.inputsElement());
-        node.append(this.outputsElement());
+        node.append(this.contentElement())        
         this.append(node)
+        for (let i = 0; i < this.inputRefs.length; i++) {              
+            this.inputs.push({ offset: { x: this.props.x - 18, y: this.props.y+24 } });            
+        }
+        
+        for (let i = 0; i < this.outputRefs.length; i++) {
+            this.outputs.push({ offset: { x: this.props.x + 180, y: this.props.y +24 } });
+        }
+        this.props.onNodeMount(this.inputs, this.outputs);
     }
 
+    
 
     populateInputPoints(lenght:number, props): HTMLElement[] {
         if (props){
             var elements: HTMLElement[] = [];
             for (let i = 0; i < lenght; i++) {
                 var element = document.createElement("div");
+                element.id = "input-" + (i+1) + "-" + props.id
                 element.className = styles.nodeInput
+                
                 element.addEventListener("mousedown", function(e) {
                     e.stopPropagation();
                 })
@@ -89,10 +111,11 @@ export default class NodeComponent extends HTMLElement {
             for (let i = 0; i < lenght; i++) {
                 var element = document.createElement("div");
                 element.className = styles.nodeOutput
+                element.id = "output-" + (i+1) + "-" + props.id
                 element.addEventListener("mousedown", function(e) {
                     if (props.onMouseDownOutput) props.onMouseDownOutput(i);
                 })
-                
+
                 elements.push(element)
             }
             return elements

@@ -56,6 +56,7 @@ export default class NodesBoard extends HTMLElement {
         
         this.props.nodes.forEach((node, index) => {
             var props: NodeComponentProps = {
+                ref:scene,
                 id: node.id,
                 x:this.props.nodesPositions[index].x,
                 y:this.props.nodesPositions[index].y,
@@ -68,7 +69,6 @@ export default class NodesBoard extends HTMLElement {
                     this.props.onNodeMount({                            
                         nodeIndex: index,
                         inputs: inputs.map((values: { offset: { x: number; y: number } }) => {     
-                            
                             return {
                                 offset: {
                                     x: values.offset.x - scene.getBoundingClientRect().x - this.props.nodesPositions[index].x + 6,

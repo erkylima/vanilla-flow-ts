@@ -201,28 +201,6 @@ class FlowChart extends HTMLElement{
             this.clickedDelta = { x: 0, y: 0 };
             this.newEdge = null;
 
-            const nodesBoard = new NodesBoard({
-                nodesPositions:this.nodesPositions,
-                nodes:this.nodesData,
-                onNodeMount:((values) => this.handleOnNodeMount(values)),
-                onNodePress:((deltaX, deltaY) => this.handleOnNodePress(deltaX, deltaY)),
-                onNodeMove:((nodeIndex, x, y) => this.handleOnNodeMove(nodeIndex, x, y)),
-                onNodeDelete:((nodeId) => this.handleOnNodeDelete(nodeId)),
-                onOutputMouseDown:((nodeIndex, outputNode) => this.handleOnOutputMouseDown(nodeIndex, outputNode)),
-                onInputMouseUp:((nodeIndex, InputNode) => this.handleOnInputMouseUp(nodeIndex, InputNode)),
-                onMouseUp: (() => this.handleOnMouseUp()),
-                onMouseMove:this.handleOnMouseMove            
-            }); 
-            this.nodesBoard = nodesBoard;
-
-            const edgesBoard = new EdgesBoard({
-                newEdge:this.newEdge,
-                edgesActives:this.edgesActive,
-                edgesPositions:this.edgesPositions,
-                onDeleteEdge: ((e) => this.handleOnDeleteEdge(e))
-                
-            });
-            this.edgesBoard = edgesBoard
             this.render();
         }
     }
@@ -270,8 +248,34 @@ class FlowChart extends HTMLElement{
             var main = this.mainElement()
             var wrapper = this.wrapperElement()
             var content = this.contentElement()
+            const nodesBoard = new NodesBoard({
+                nodesPositions:this.nodesPositions,
+                nodes:this.nodesData,
+                onNodeMount:((values) => this.handleOnNodeMount(values)),
+                onNodePress:((deltaX, deltaY) => this.handleOnNodePress(deltaX, deltaY)),
+                onNodeMove:((nodeIndex, x, y) => this.handleOnNodeMove(nodeIndex, x, y)),
+                onNodeDelete:((nodeId) => this.handleOnNodeDelete(nodeId)),
+                onOutputMouseDown:((nodeIndex, outputNode) => this.handleOnOutputMouseDown(nodeIndex, outputNode)),
+                onInputMouseUp:((nodeIndex, InputNode) => this.handleOnInputMouseUp(nodeIndex, InputNode)),
+                onMouseUp: (() => this.handleOnMouseUp()),
+                onMouseMove:this.handleOnMouseMove            
+            }); 
+            nodesBoard
+            this.nodesBoard = nodesBoard;
             content.appendChild(this.nodesBoard)
+
+            
+
+            const edgesBoard = new EdgesBoard({
+                newEdge:this.newEdge,
+                edgesActives:this.edgesActive,
+                edgesPositions:this.edgesPositions,
+                onDeleteEdge: ((e) => this.handleOnDeleteEdge(e))
+                
+            });
+            this.edgesBoard = edgesBoard
             content.appendChild(this.edgesBoard)
+            
             wrapper.append(content)
             main.append(wrapper)
             this.append(main)    

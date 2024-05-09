@@ -51,6 +51,7 @@ export default class EdgeComponent extends HTMLElement {
             var d = "M " + m + " C " + c
             path.setAttribute("class", this.props.isNew ? styles.edgeNew : this.props.selected ? styles.edgeSelected : styles.edge);
             path.setAttribute('d',d);
+            
             path.onclick = ((ev) => this.props.onClickEdge());
             // this.appendChild(path)
             // this.innerHTML = `<path d="${d}" class="${styles.edge}"></path>`
