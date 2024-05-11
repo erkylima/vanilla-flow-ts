@@ -57,6 +57,10 @@ export default class NodeComponent extends HTMLElement {
             for (let i = 0; i < this.inputRefs.length; i++) {  
                 alert(JSON.stringify({ offset: { x: this.querySelector(`#input-${(i+1)}-${this.props.id}`).getBoundingClientRect().x, y: this.querySelector(`#input-${(i+1)}-${this.props.id}`).getBoundingClientRect().y } }))                
             }
+            for (let i = 0; i < this.outputRefs.length; i++) {  
+
+                alert(JSON.stringify({ offset: { x: this.querySelector(`#output-${(i+1)}-${this.props.id}`).getBoundingClientRect().x, y: this.querySelector(`#output-${(i+1)}-${this.props.id}`).getBoundingClientRect().y } }))                
+            }
             
         }
         catch{}
