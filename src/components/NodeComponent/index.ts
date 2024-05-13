@@ -13,7 +13,7 @@ export interface NodeComponentProps {
     selected: boolean;
     actions?: { delete?: boolean };
     label?: string;
-    content: any;
+    content: string | HTMLElement;
     inputs: number;
     outputs: number;  
     onNodeMount?: (inputs: { offset: { x: number; y: number } }[], outputs: { offset: { x: number; y: number } }[]) => void;  
@@ -51,41 +51,42 @@ export default class NodeComponent extends HTMLElement {
     }
 
     connectedCallback() {
-        try {
-            this.querySelector(`#${this.props.id}`).append(this.inputsElement());
-            this.querySelector(`#${this.props.id}`).append(this.outputsElement());
-            for (let i = 0; i < this.inputRefs.length; i++) {  
-                alert(JSON.stringify({ offset: { x: this.querySelector(`#input-${(i+1)}-${this.props.id}`).getBoundingClientRect().x, y: this.querySelector(`#input-${(i+1)}-${this.props.id}`).getBoundingClientRect().y } }))                
-            }
-            for (let i = 0; i < this.outputRefs.length; i++) {  
-
-                alert(JSON.stringify({ offset: { x: this.querySelector(`#output-${(i+1)}-${this.props.id}`).getBoundingClientRect().x, y: this.querySelector(`#output-${(i+1)}-${this.props.id}`).getBoundingClientRect().y } }))                
-            }
-            
+        
+        for (let i = 0; i < this.inputRefs.length; i++) {              
+            this.inputs.push({ offset: { x: this.querySelector(`#input-${(i+1)}-${this.props.id}`).getBoundingClientRect().x, y: this.querySelector(`#input-${(i+1)}-${this.props.id}`).getBoundingClientRect().y } });
         }
-        catch{}
+        
+        for (let i = 0; i < this.outputRefs.length; i++) {
+            this.outputs.push({ offset: { x: this.querySelector(`#output-${(i+1)}-${this.props.id}`).getBoundingClientRect().x, y: this.querySelector(`#output-${(i+1)}-${this.props.id}`).getBoundingClientRect().y } });
+        }
+
+        this.props.onNodeMount(this.inputs, this.outputs);
+        // for (let i = 0; i < this.inputRefs.length; i++) {  
+        //     alert(JSON.stringify())                
+        // }
+        // for (let i = 0; i < this.outputRefs.length; i++) {  
+
+        //     alert(JSON.stringify())                
+        // }
+            
+        
     }
     attributeChangedCallback(name: any, oldValue: any, newValue: any) {
         console.log(
           `Attribute ${name} has changed from ${oldValue} to ${newValue}.`,
         );
-      }
+    }
     
     render() {        
         
         const node = this.nodeElement()
         node.append(this.deleteElement())
-        node.append(this.labelElement())
-        node.append(this.contentElement())        
+        if (this.props.label) node.append(this.labelElement())
+        node.append(this.contentElement())
+        node.append(this.inputsElement())
+        node.append(this.outputsElement())
         this.append(node)
-        for (let i = 0; i < this.inputRefs.length; i++) {              
-            this.inputs.push({ offset: { x: this.props.x - 18, y: this.props.y+24 } });            
-        }
         
-        for (let i = 0; i < this.outputRefs.length; i++) {
-            this.outputs.push({ offset: { x: this.props.x + 180, y: this.props.y +24 } });
-        }
-        this.props.onNodeMount(this.inputs, this.outputs);
     }
 
     
@@ -159,10 +160,13 @@ export default class NodeComponent extends HTMLElement {
         return outputs
     }
 
-    contentElement(){
-        var content  = document.createElement("div")
+    contentElement(){        
+        if (this.props.content instanceof HTMLElement){
+            return this.props.content
+        } 
+        const content  = document.createElement("div")
         content.className = styles.nodeContent
-        content.innerText = this.props.content
+        content.innerText = this.props.content + ""
         return content
     }
 

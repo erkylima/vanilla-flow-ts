@@ -1,5 +1,6 @@
 import styles from './styles.module.css'
 export interface EdgeComponentProps {
+    id?: string,
     selected: boolean;
     isNew: boolean;
     position: { x0: number; y0: number; x1: number; y1: number };
@@ -14,6 +15,7 @@ export default class EdgeComponent extends HTMLElement {
     props:EdgeComponentProps
     middlePoint:Position
     path:SVGPathElement
+    static observedAttributes = ["d"];
 
     constructor(props: EdgeComponentProps) {
         super();        
@@ -24,7 +26,6 @@ export default class EdgeComponent extends HTMLElement {
                 y: props.position.y0 + (props.position.y1 - props.position.y0) / 2,
             };
 
-            
             this.render();
         }
     }
@@ -32,6 +33,13 @@ export default class EdgeComponent extends HTMLElement {
     setMiddlePoint(middlePoint:Position){
         this.middlePoint = middlePoint;
     }
+    
+    attributeChangedCallback(name: any, oldValue: any, newValue: any) {
+        console.log(
+          `Attribute ${name} has changed from ${oldValue} to ${newValue}.`,
+        );
+    }
+
     render(){
         if(this.props){
             const middleX = this.props.position.x0 + (this.props.position.x1 - this.props.position.x0) / 2;
@@ -40,18 +48,26 @@ export default class EdgeComponent extends HTMLElement {
                 x: middleX,
                 y: middleY,
             })
+            
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            var m = `${this.props.position.x0} ${this.props.position.y0}`
-            var c = `${
+            
+            path.setAttribute("class", this.props.isNew ? styles.edgeNew : this.props.selected ? styles.edgeSelected : styles.edge);
+            path.setAttribute('d',`
+            M ${this.props.position.x0} ${this.props.position.y0} C ${
                 this.props.position.x0 + this.calculateOffset(Math.abs(this.props.position.x1 - this.props.position.x0))
             } ${this.props.position.y0}, ${this.props.position.x1 - this.calculateOffset(Math.abs(this.props.position.x1 - this.props.position.x0))} ${
                 this.props.position.y1
-            }, ${this.props.position.x1} ${this.props.position.y1}`
-            
-            var d = "M " + m + " C " + c
-            path.setAttribute("class", this.props.isNew ? styles.edgeNew : this.props.selected ? styles.edgeSelected : styles.edge);
-            path.setAttribute('d',d);
-            
+            }, ${this.props.position.x1} ${this.props.position.y1}
+            `);
+            this.setAttribute("class", this.props.isNew ? styles.edgeNew : this.props.selected ? styles.edgeSelected : styles.edge);
+            this.setAttribute('d', `
+            M ${this.props.position.x0} ${this.props.position.y0} C ${
+                this.props.position.x0 + this.calculateOffset(Math.abs(this.props.position.x1 - this.props.position.x0))
+            } ${this.props.position.y0}, ${this.props.position.x1 - this.calculateOffset(Math.abs(this.props.position.x1 - this.props.position.x0))} ${
+                this.props.position.y1
+            }, ${this.props.position.x1} ${this.props.position.y1}
+            `)
+
             path.onclick = ((ev) => this.props.onClickEdge());
             // this.appendChild(path)
             // this.innerHTML = `<path d="${d}" class="${styles.edge}"></path>`

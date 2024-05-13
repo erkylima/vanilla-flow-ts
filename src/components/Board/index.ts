@@ -136,10 +136,12 @@ function getInitialNodes(
 }
 
 class FlowChart extends HTMLElement{
+    static observedAttributes = ["nodesPositions", "edgesActive"];
 
     props : BoardProps;
     edgesBoard: EdgesBoard;
     nodesBoard: NodesBoard;
+    content: HTMLElement
     // EDGES
     edgesNodes: EdgesNodes
     set setEdgeNodes(edgesNodes: EdgesNodes) {
@@ -181,7 +183,10 @@ class FlowChart extends HTMLElement{
         this.newEdge = newEdge;
     }
 
-    
+    attributeChangedCallback(name: any, oldValue: any, newValue: any) {
+        console.log(`Attribute ${name} has changed.`);
+    }
+
 
     constructor(props: BoardProps) {
         super();
@@ -205,7 +210,8 @@ class FlowChart extends HTMLElement{
         }
     }
    
-
+    
+    
     mainElement():HTMLElement {
         var drawer = document.createElement('div');
         drawer.className = styles.main
@@ -241,8 +247,10 @@ class FlowChart extends HTMLElement{
                 this.setNodesData =initNodesData;
                 this.setNodesOffsets = initNodesOffsets;
             }
+            
         }
     }
+
 
     render() {
             var main = this.mainElement()
@@ -260,22 +268,23 @@ class FlowChart extends HTMLElement{
                 onMouseUp: (() => this.handleOnMouseUp()),
                 onMouseMove:this.handleOnMouseMove            
             }); 
-            nodesBoard
-            this.nodesBoard = nodesBoard;
-            content.appendChild(this.nodesBoard)
-
             
-
-            const edgesBoard = new EdgesBoard({
-                newEdge:this.newEdge,
-                edgesActives:this.edgesActive,
-                edgesPositions:this.edgesPositions,
-                onDeleteEdge: ((e) => this.handleOnDeleteEdge(e))
+            content.appendChild(nodesBoard);
+            this.content = content;
+            setTimeout(() => {
+                console.log('setting dynamic attribute. This should trigger attributeChangedCallback. But no.', JSON.stringify(this.edgesActive));
                 
-            });
-            this.edgesBoard = edgesBoard
-            content.appendChild(this.edgesBoard)
-            
+                const edgesBoard = new EdgesBoard({
+                    newEdge:this.newEdge,
+                    edgesActives:this.edgesActive,
+                    edgesPositions:this.edgesPositions,
+                    onDeleteEdge: ((e) => this.handleOnDeleteEdge(e))
+                    
+                });
+    
+                this.edgesBoard = edgesBoard
+                this.content.appendChild(this.edgesBoard)
+            }, 100);
             wrapper.append(content)
             main.append(wrapper)
             this.append(main)    
@@ -289,7 +298,7 @@ class FlowChart extends HTMLElement{
         outputs: { offset: { x: number; y: number } }[];
         }) {
 
-        const nodesOffset = produce(
+            const nodesOffset = produce(
             (nodesOffsets: {
                 inputs: { offset: { x: number; y: number } }[];
                 outputs: { offset: { x: number; y: number } }[];
@@ -318,8 +327,7 @@ class FlowChart extends HTMLElement{
 
         const edgesPositions = (prev: EdgesPositions)=> {
             const next = { ...prev };
-            this.nodesData[values.nodeIndex].edgesIn.map((edgeId: string) => {
-                
+            this.nodesData[values.nodeIndex].edgesIn.map((edgeId: string) => {                
                 next[edgeId] = {
                     x0: prev[edgeId]?.x0 || 0,
                     y0: prev[edgeId]?.y0 || 0,
@@ -364,7 +372,7 @@ class FlowChart extends HTMLElement{
         const edgesPositions = (prev: EdgesPositions) => {
             const next = { ...prev };
             this.nodesData[nodeIndex].edgesIn.map((edgeId: string) => {
-                if (this.edgesActive[edgeId])
+                if (this.edgesActive[edgeId])                    
                     next[edgeId] = {
                         x0: prev[edgeId]?.x0 || 0,
                         y0: prev[edgeId]?.y0 || 0,
@@ -373,15 +381,17 @@ class FlowChart extends HTMLElement{
                     };
             });
             this.nodesData[nodeIndex].edgesOut.map((edgeId: string) => {
-                if (this.edgesActive[edgeId])
+                if (this.edgesActive[edgeId]){
                     next[edgeId] = {
                         x0: x + this.nodesOffsets[nodeIndex].outputs[this.edgesNodes[edgeId].outputIndex].offset.x - this.clickedDelta.x,
                         y0: y + this.nodesOffsets[nodeIndex].outputs[this.edgesNodes[edgeId].outputIndex].offset.y - this.clickedDelta.y,
                         x1: prev[edgeId]?.x1 || 0,
                         y1: prev[edgeId]?.y1 || 0,
                     };
+                }
             });
             return next;
+            
         }
         this.setEdgesPositions = edgesPositions(this.edgesPositions);
 

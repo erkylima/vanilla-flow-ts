@@ -34,72 +34,81 @@ export class EdgesBoard extends HTMLElement {
     constructor(props:EdgeBoardProps){
         super();
         this.props = props;
-        if(this.props){
-            var newIds = Object.keys(this.props.edgesActives).filter((elem:string) => this.props.edgesActives[elem]);
-            this.setIds = newIds;
-            if (this.selected !== "null" && this.props.newEdge !== null){ 
+        var newIds = Object.keys(this.props.edgesActives).filter((elem:string) => this.props.edgesActives[elem]);
+        this.setIds = newIds;
+        
+        if (this.selected !== "null" && this.props.newEdge !== null){                 
+            this.setSelected = "null";
     
-                this.setSelected = "null";
-    
-            }
-            this.render();
         }
+        this.render();
+    }
+
+    connectedCallback() {
+        
     }
 
     render() {
-        let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.setAttribute("class", styles.main);
-
-        this.ids.forEach((edgeId: string) => {
-            if (this.props.edgesActives[edgeId])
+        if(this.props){
+            
+            let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("class", styles.main);
+            
+            this.ids.forEach((edgeId: string) => {
+                
+                if (this.props.edgesActives[edgeId])
+                    var props: EdgeComponentProps = {
+                        id: edgeId,
+                        selected: this.selected === edgeId,
+                        position: {
+                            x0: this.props.edgesPositions[edgeId]?.x0 || 0,
+                            y0: this.props.edgesPositions[edgeId]?.y0 || 0,
+                            x1: this.props.edgesPositions[edgeId]?.x1 || 0,
+                            y1: this.props.edgesPositions[edgeId]?.y1 || 0,
+                        },
+                        isNew: false,
+                        onClickDelete: () => {
+                            this.props.onDeleteEdge(edgeId);
+                        },
+                        onClickOutside: () => {
+    
+                        },
+                        onClickEdge: () => {
+                            this.setSelected = edgeId;
+    
+                        }
+    
+                    };
+                    const edge = new EdgeComponent(props)
+                    svg.append(edge.getPath())
+                    
+            });
+            if (this.props.newEdge !== null) {
+                
                 var props: EdgeComponentProps = {
-                    selected: this.selected === edgeId,
+                    
+                    selected: false,                      
                     position: {
-                        x0: this.props.edgesPositions[edgeId]?.x0 || 0,
-                        y0: this.props.edgesPositions[edgeId]?.y0 || 0,
-                        x1: this.props.edgesPositions[edgeId]?.x1 || 0,
-                        y1: this.props.edgesPositions[edgeId]?.y1 || 0,
+                        x0: this.props.newEdge.position.x0,
+                        y0: this.props.newEdge.position.y0,
+                        x1: this.props.newEdge.position.x1,
+                        y1: this.props.newEdge.position.y1,
                     },
-                    isNew: false,
+                    isNew: true,
                     onClickDelete: () => {
-                        this.props.onDeleteEdge(edgeId);
                     },
                     onClickOutside: () => {
-
                     },
                     onClickEdge: () => {
-                        this.setSelected = edgeId;
-
                     }
-
+    
                 };
                 const edge = new EdgeComponent(props)
-                svg.append(edge.getPath())
-                
-        });
-        if (this.props.newEdge !== null) {
-            
-            var props: EdgeComponentProps = {
-                selected: false,                      
-                position: {
-                    x0: this.props.newEdge.position.x0,
-                    y0: this.props.newEdge.position.y0,
-                    x1: this.props.newEdge.position.x1,
-                    y1: this.props.newEdge.position.y1,
-                },
-                isNew: true,
-                onClickDelete: () => {
-                },
-                onClickOutside: () => {
-                },
-                onClickEdge: () => {
-                }
+                svg.append(edge.getPath());
+            }        
+            this.append(svg)
 
-            };
-            const edge = new EdgeComponent(props)
-            svg.append(edge.getPath());
-        }        
-        this.append(svg)
+        }
         
     }
 }    

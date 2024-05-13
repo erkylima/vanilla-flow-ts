@@ -106,8 +106,8 @@ export default class NodesBoard extends HTMLElement {
             
             scene.append(nodeComp);
         })
-        this.appendChild(scene)
         this.scene = scene;
+        this.appendChild(scene)
     }
     handleOnMouseMoveScene(event: any, scene:HTMLElement) {
         if (this.selected != null) {

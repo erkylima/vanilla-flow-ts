@@ -1,4 +1,10 @@
 import FlowChart, { BoardEdgeProps, BoardNodeProps } from "./components/Board";
+var p2 = document.createElement("p");
+p2.textContent = "ook"
+var p = document.createElement("p");
+p.textContent = "This is a node with two inputs and two outputs"
+var di = document.createElement("div");
+di.append(p);
 
 const initialNodes = [
     {
@@ -24,7 +30,7 @@ const initialNodes = [
         id: "node-3",
         position: { x: 350, y: 300 },
         data: {
-            content: "two inputs, two outputs",
+            content: p,
         },
         inputs: 2,
         outputs: 2,
@@ -32,7 +38,7 @@ const initialNodes = [
 
     {
         id: "node-4",
-        position: { x: 700, y: 100 },
+        position: { x: 900, y: 100 },
         data: {
             label: "Only inputs",
             content: "This is a node with only inputs",
