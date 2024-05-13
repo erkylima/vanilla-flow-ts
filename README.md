@@ -8,9 +8,6 @@ Instalação
 
 Para começar a usar a biblioteca, você pode instalá-la via npm ou yarn:
 
-
-Copiar código
-
 `npm install vanilla-flow-ts # ou yarn add vanilla-flow-ts`
 
 Uso
@@ -18,8 +15,6 @@ Uso
 
 Após a instalação, você pode importar os componentes desejados em seu projeto e começar a usá-los. Por exemplo:
 
-
-Copiar código
 
 `import FlowChart, { BoardEdgeProps, BoardNodeProps } from "./components/Board";  // Use FlowChart em seu código`
 
@@ -30,26 +25,18 @@ Para iniciar o desenvolvimento local, siga estas etapas:
 
 1.  Clone este repositório:
 
-Copiar código
-
 `git clone https://github.com/seu-usuario/seu-repositorio.git`
 
 1.  Navegue até o diretório do projeto:
 
-Copiar código
-
 `cd meu-biblioteca-ui`
 
-3.  Instale as dependências:
-
-Copiar código
+1.  Instale as dependências:
 
 `yarn install`
 
 1.  Inicie o ambiente de desenvolvimento:
 
-
-Copiar código
 
 `yarn dev`
 
@@ -60,8 +47,6 @@ Build
 
 Para construir a biblioteca para produção, execute o seguinte comando:
 
-
-Copiar código
 
 `yarn build`
 
