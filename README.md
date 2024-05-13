@@ -3,6 +3,10 @@ Biblioteca UI Node Based para Criação de Páginas de Fluxo
 
 Este projeto é uma biblioteca UI baseada em Web Components e TypeScript, projetada para facilitar a criação de páginas de fluxo em aplicações web. Ele fornece componentes reutilizáveis e customizáveis que podem ser facilmente integrados em qualquer projeto web.
 
+Pré Visualização
+----------
+![Preview 1](https://github.com/erkylima/vanilla-flow-ts/blob/main/images/preview1.png?raw=true)
+
 Instalação
 ----------
 
