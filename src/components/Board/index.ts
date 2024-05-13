@@ -368,17 +368,29 @@ class FlowChart extends HTMLElement{
         const node = document.getElementById("node-" + (nodeIndex +1));
         
         node.style.transform = `translate(${x - this.clickedDelta.x}px, ${y - this.clickedDelta.y}px)`
-        
+        const calculateOffset = (value: number) => {            
+            return (value * 100) / 200;            
+        }
         const edgesPositions = (prev: EdgesPositions) => {
             const next = { ...prev };
+            
+            
             this.nodesData[nodeIndex].edgesIn.map((edgeId: string) => {
-                if (this.edgesActive[edgeId])                    
+                if (this.edgesActive[edgeId]){
                     next[edgeId] = {
                         x0: prev[edgeId]?.x0 || 0,
                         y0: prev[edgeId]?.y0 || 0,
                         x1: x + this.nodesOffsets[nodeIndex].inputs[this.edgesNodes[edgeId].inputIndex].offset.x - this.clickedDelta.x,
                         y1: y + this.nodesOffsets[nodeIndex].inputs[this.edgesNodes[edgeId].inputIndex].offset.y - this.clickedDelta.y,
                     };
+
+                    document.getElementById(edgeId).setAttribute('d', `
+                    M ${next[edgeId].x0} ${next[edgeId].y0} C ${
+                        next[edgeId].x0 + calculateOffset(Math.abs(next[edgeId].x1 - next[edgeId].x0))
+                    } ${next[edgeId].y0}, ${next[edgeId].x1 - calculateOffset(Math.abs(next[edgeId].x1 - next[edgeId].x0))} ${
+                        next[edgeId].y1
+                    }, ${next[edgeId].x1} ${next[edgeId].y1}
+                    `)                }
             });
             this.nodesData[nodeIndex].edgesOut.map((edgeId: string) => {
                 if (this.edgesActive[edgeId]){
@@ -388,8 +400,16 @@ class FlowChart extends HTMLElement{
                         x1: prev[edgeId]?.x1 || 0,
                         y1: prev[edgeId]?.y1 || 0,
                     };
+                    document.getElementById(edgeId).setAttribute('d', `
+                    M ${next[edgeId].x0} ${next[edgeId].y0} C ${
+                        next[edgeId].x0 + calculateOffset(Math.abs(next[edgeId].x1 - next[edgeId].x0))
+                    } ${next[edgeId].y0}, ${next[edgeId].x1 - calculateOffset(Math.abs(next[edgeId].x1 - next[edgeId].x0))} ${
+                        next[edgeId].y1
+                    }, ${next[edgeId].x1} ${next[edgeId].y1}
+                    `)
                 }
             });
+            
             return next;
             
         }
@@ -400,7 +420,9 @@ class FlowChart extends HTMLElement{
 
     handleOnNodeDelete(nodeId: string) {
         const newNodes = this.props.nodes.filter((node: BoardNodeProps) => node.id !== nodeId);
-        const newEdges = this.props.edges.filter((edge: BoardEdgeProps) => edge.sourceNode !== nodeId && edge.targetNode !== nodeId);
+        const newEdges = this.props.edges.filter((edge: BoardEdgeProps) => {
+            edge.sourceNode !== nodeId && edge.targetNode !== nodeId            
+        });
         this.props.onEdgesChange(newEdges);
         this.props.onNodesChange(newNodes);
         document.getElementById(nodeId).remove();

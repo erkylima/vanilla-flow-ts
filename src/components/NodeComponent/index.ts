@@ -146,6 +146,7 @@ export default class NodeComponent extends HTMLElement {
                 
             })
         }
+        
         return inputs
     }
 

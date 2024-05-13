@@ -50,7 +50,7 @@ export default class EdgeComponent extends HTMLElement {
             })
             
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            
+            path.setAttribute("id", this.props.id);
             path.setAttribute("class", this.props.isNew ? styles.edgeNew : this.props.selected ? styles.edgeSelected : styles.edge);
             path.setAttribute('d',`
             M ${this.props.position.x0} ${this.props.position.y0} C ${
