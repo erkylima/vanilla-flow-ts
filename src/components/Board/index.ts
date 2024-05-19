@@ -400,7 +400,7 @@ class FlowChart extends HTMLElement{
                         x1: prev[edgeId]?.x1 || 0,
                         y1: prev[edgeId]?.y1 || 0,
                     };
-                    document.getElementById(edgeId).setAttribute('d', `
+                    this.querySelector("#"+edgeId).setAttribute('d', `
                     M ${next[edgeId].x0} ${next[edgeId].y0} C ${
                         next[edgeId].x0 + calculateOffset(Math.abs(next[edgeId].x1 - next[edgeId].x0))
                     } ${next[edgeId].y0}, ${next[edgeId].x1 - calculateOffset(Math.abs(next[edgeId].x1 - next[edgeId].x0))} ${

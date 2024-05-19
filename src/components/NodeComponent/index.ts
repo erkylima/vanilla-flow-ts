@@ -161,14 +161,28 @@ export default class NodeComponent extends HTMLElement {
         return outputs
     }
 
-    contentElement(){        
-        if (this.props.content instanceof HTMLElement){
-            return this.props.content
-        } 
+    contentElement(){ 
         const content  = document.createElement("div")
         content.className = styles.nodeContent
-        content.innerText = this.props.content + ""
-        return content
+
+        if (this.props.content instanceof HTMLElement){
+            content.appendChild(this.props.content)
+        } else {
+            content.innerText = this.props.content + ""
+        }
+        content.addEventListener("mousedown", ((ev) => {
+            setTimeout(function() {
+                // You are now in a hold state, you can do whatever you like!
+              }, 500);
+            this.props.onMouseDown(ev)
+
+        }));
+        content.addEventListener("mouseup", ((ev) => {
+
+            this.props.onMouseUp(ev)
+
+        }));
+        return content  
     }
 
     labelElement() {
@@ -190,19 +204,7 @@ export default class NodeComponent extends HTMLElement {
             document.getElementById("action-"+this.props.id).className = this.props.selected ? styles.actions : styles.actionsHidden
             drawer.className = this.props.selected ? styles.nodeSelected : styles.node
             
-        }));
-        drawer.addEventListener("mousedown", ((ev) => {
-            setTimeout(function() {
-                // You are now in a hold state, you can do whatever you like!
-              }, 500);
-            this.props.onMouseDown(ev)
-
-        }));
-        drawer.addEventListener("mouseup", ((ev) => {
-
-            this.props.onMouseUp(ev)
-
-        }));
+        }));        
         
         return drawer
     }

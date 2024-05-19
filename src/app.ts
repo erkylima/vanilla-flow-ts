@@ -1,17 +1,20 @@
 import FlowChart, { BoardEdgeProps, BoardNodeProps } from "./components/Board";
-var p2 = document.createElement("p");
-p2.textContent = "ook"
-var p = document.createElement("p");
+const pnode1 = document.createElement("p");
+pnode1.textContent = "This is a simple node"
+const pnode2 = document.createElement("p");
+pnode2.textContent = "This is a node with a label"
+const pnode4 = document.createElement("p");
+pnode4.textContent = "This is a node with only inputs"
+const p = document.createElement("p");
 p.textContent = "This is a node with two inputs and two outputs"
-var di = document.createElement("div");
-di.append(p);
+
 
 const initialNodes = [
     {
         id: "node-1",
         position: { x: 50, y: 100 },
         data: {
-            content: "This is a simple node",
+            content: pnode1,
         },
         inputs: 0,
         outputs: 1,
@@ -21,7 +24,7 @@ const initialNodes = [
         position: { x: 350, y: 100 },
         data: {
             label: "Node with label",
-            content: "This is a node with a label",
+            content: pnode2,
         },
         inputs: 1,
         outputs: 1,
@@ -41,7 +44,7 @@ const initialNodes = [
         position: { x: 900, y: 100 },
         data: {
             label: "Only inputs",
-            content: "This is a node with only inputs",
+            content: pnode4,
         },
         inputs: 2,
         outputs: 0,
