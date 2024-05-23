@@ -34,7 +34,7 @@ export default class NodeComponent extends HTMLElement {
     outputRefs: HTMLElement[]
     inputs: { offset: { x: number; y: number } }[] = []
     outputs: { offset: { x: number; y: number } }[] = []
-    static observedAttributes = ["x", "y"];
+    static observedAttributes = ["style"];
 
     constructor(props: NodeComponentProps) {
         super();
@@ -74,19 +74,18 @@ export default class NodeComponent extends HTMLElement {
     attributeChangedCallback(name: any, oldValue: any, newValue: any) {
         console.log(
           `Attribute ${name} has changed from ${oldValue} to ${newValue}.`,
-        );
+        );        
     }
     
     render() {        
         
-        const node = this.nodeElement()
-        node.append(this.deleteElement())
-        if (this.props.label) node.append(this.labelElement())
-        node.append(this.contentElement())
-        node.append(this.inputsElement())
-        node.append(this.outputsElement())
-        this.append(node)
-        
+        this.nodeElement()
+        this.append(this.deleteElement())
+        if (this.props.label) this.append(this.labelElement())
+        this.append(this.contentElement())
+        this.append(this.inputsElement())
+        this.append(this.outputsElement())
+
     }
 
     
@@ -175,9 +174,8 @@ export default class NodeComponent extends HTMLElement {
             setTimeout(function() {
                 // You are now in a hold state, you can do whatever you like!
               }, 500);
-            this.props.onMouseDown(ev)
-            this.setAttribute("x", ev.x + "")
-            this.setAttribute("y", ev.y + "")
+            const position = this.props.onMouseDown(ev)
+            
         }));
         content.addEventListener("mouseup", ((ev) => {
 
@@ -196,19 +194,16 @@ export default class NodeComponent extends HTMLElement {
     }
 
     nodeElement() {
-        var drawer = document.createElement("div");
-        drawer.id = this.props.id
-        drawer.className = this.props.selected ? styles.nodeSelected : styles.node
-        drawer.style.transform = `translate(${this.props.x}px, ${this.props.y}px)`
-        drawer.addEventListener("dblclick", ((ev) => {
+        this.id = this.props.id
+        this.className = this.props.selected ? styles.nodeSelected : styles.node
+        this.style.transform = `translate(${this.props.x}px, ${this.props.y}px)`
+        this.addEventListener("dblclick", ((ev) => {
             ev.stopImmediatePropagation()
             this.props.selected = !this.props.selected
             document.getElementById("action-"+this.props.id).className = this.props.selected ? styles.actions : styles.actionsHidden
-            drawer.className = this.props.selected ? styles.nodeSelected : styles.node
+            this.className = this.props.selected ? styles.nodeSelected : styles.node
             
         }));        
-        
-        return drawer
     }
 
     deleteElement() {
