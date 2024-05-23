@@ -384,10 +384,8 @@ class FlowChart extends HTMLElement{
                         x1: x + this.nodesOffsets[nodeIndex].inputs[this.edgesNodes[edgeId].inputIndex].offset.x - this.clickedDelta.x,
                         y1: y + this.nodesOffsets[nodeIndex].inputs[this.edgesNodes[edgeId].inputIndex].offset.y - this.clickedDelta.y,
                     };
-                    alert("#"+ edgeId )
-                    const edge = <EdgeComponent>document.getElementById(edgeId);
-                    alert(edge)
-                    edge.setAttribute('d', `
+
+                    document.getElementById(edgeId).setAttribute('d', `
                     M ${next[edgeId].x0} ${next[edgeId].y0} C ${
                         next[edgeId].x0 + calculateOffset(Math.abs(next[edgeId].x1 - next[edgeId].x0))
                     } ${next[edgeId].y0}, ${next[edgeId].x1 - calculateOffset(Math.abs(next[edgeId].x1 - next[edgeId].x0))} ${
