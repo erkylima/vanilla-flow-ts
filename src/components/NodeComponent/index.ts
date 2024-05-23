@@ -30,10 +30,10 @@ export default class NodeComponent extends HTMLElement {
     
     props: NodeComponentProps = null
 
-    inputRefs: HTMLElement[]
-    outputRefs: HTMLElement[]
-    inputs: { offset: { x: number; y: number } }[] = []
-    outputs: { offset: { x: number; y: number } }[] = []
+    private inputRefs: HTMLElement[]
+    private outputRefs: HTMLElement[]
+    private inputs: { offset: { x: number; y: number } }[] = []
+    private outputs: { offset: { x: number; y: number } }[] = []
     static observedAttributes = ["style"];
 
     constructor(props: NodeComponentProps) {

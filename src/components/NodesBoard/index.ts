@@ -56,7 +56,6 @@ export default class NodesBoard extends HTMLElement {
         
         this.props.nodes.forEach((node, index) => {
             var props: NodeComponentProps = {
-                ref:scene,
                 id: node.id,
                 x:this.props.nodesPositions[index].x,
                 y:this.props.nodesPositions[index].y,
@@ -84,26 +83,27 @@ export default class NodesBoard extends HTMLElement {
                                 },
                             };
                         }),
-                }),
-                onMouseDown: (event: MouseEvent):Position => {
-                    return this.handleOnMouseDownNode(index, event.x, event.y, this.props, scene)
-                },
-                onMouseUp: (event: MouseEvent) => {
-                    this.handleOnMouseUpScene(event, this.props)
-                },
+                })
                 
-                onMouseDownOutput: (outputIndex: number) => this.props.onOutputMouseDown(index, outputIndex),
-                onMouseUpInput: (inputIndex: number) => this.props.onInputMouseUp(index, inputIndex),
-                onClickOutside: () => {
-                    if (index === this.selected) this.setSelected = null;
-                },
-                onClickDelete: () => {
-                    this.setSelected = null ;
-                    this.props.onNodeDelete(node.id);
-                },
             }
-            var nodeComp = new NodeComponent(props)
+            let nodeComp = new NodeComponent(props)
+            nodeComp.props.ref = nodeComp
+            nodeComp.props.onMouseDown = (event: MouseEvent):Position => {
+                return this.handleOnMouseDownNode(index, event.x, event.y, this.props, scene)
+            },
+            nodeComp.props.onMouseUp = (event: MouseEvent) => {
+                this.handleOnMouseUpScene(event, this.props)
+            },
             
+            nodeComp.props.onMouseDownOutput = (outputIndex: number) => this.props.onOutputMouseDown(index, outputIndex),
+            nodeComp.props.onMouseUpInput = (inputIndex: number) => this.props.onInputMouseUp(index, inputIndex),
+            nodeComp.props.onClickOutside = () => {
+                if (index === this.selected) this.setSelected = null;
+            },
+            nodeComp.props.onClickDelete = () => {
+                this.setSelected = null ;
+                this.props.onNodeDelete(node.id);
+            },
             scene.append(nodeComp);
         })
         this.scene = scene;

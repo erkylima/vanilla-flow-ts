@@ -1,5 +1,6 @@
 import { produce } from "../../util/builder";
 import EdgesBoard from "../EdgesBoard";
+import NodeComponent from "../NodeComponent";
 import NodesBoard from "../NodesBoard";
 import styles from "./styles.module.css";
 
@@ -365,8 +366,7 @@ class FlowChart extends HTMLElement{
         
         var prevNode = prev(this.nodesPositions);
         this.setNodesPositions = prevNode;
-        const node = document.getElementById("node-" + (nodeIndex +1));
-        
+        const node = <NodeComponent>this.querySelector("#node-" + (nodeIndex +1));
         node.style.transform = `translate(${x - this.clickedDelta.x}px, ${y - this.clickedDelta.y}px)`
         const calculateOffset = (value: number) => {            
             return (value * 100) / 200;            
