@@ -84,7 +84,6 @@ export class EdgesBoard extends HTMLElement {
                     
             });
             if (this.props.newEdge !== null) {
-                
                 var props: EdgeComponentProps = {
                     
                     selected: false,                      
@@ -109,7 +108,7 @@ export class EdgesBoard extends HTMLElement {
             this.append(svg)
 
         }
-        
+        this.id = "edges-board"
     }
 }    
 

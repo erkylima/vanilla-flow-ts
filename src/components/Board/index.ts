@@ -414,6 +414,7 @@ class FlowChart extends HTMLElement{
             return next;
             
         }
+        
         this.setEdgesPositions = edgesPositions(this.edgesPositions);
 
 
@@ -432,7 +433,9 @@ class FlowChart extends HTMLElement{
 
     handleOnOutputMouseDown(nodeIndex: number, outputIndex: number) {
         const nodePosition = this.nodesPositions[nodeIndex];
-
+        
+        const edgesBoard = <EdgesBoard>this.querySelector("edges-board")
+        
         const outputOffset = this.nodesOffsets[nodeIndex].outputs[outputIndex].offset;
         this.setNewEdge ={
             position: {
