@@ -1,6 +1,7 @@
 import FlowChart, { BoardEdgeProps, BoardNodeProps } from "./components/Board";
-const pnode1 = document.createElement("p");
-pnode1.textContent = "This is a simple node"
+import { ElementBuilder } from "./util/builder";
+const pnode1 = ElementBuilder("p", "This is a simple node");
+
 const pnode2 = document.createElement("p");
 pnode2.textContent = "This is a node with a label"
 const pnode4 = document.createElement("p");

@@ -15,7 +15,6 @@ export default class EdgeComponent extends HTMLElement {
     props:EdgeComponentProps
     middlePoint:Position
     path:SVGPathElement
-    static observedAttributes = ["d"];
 
     constructor(props: EdgeComponentProps) {
         super();        
@@ -32,12 +31,6 @@ export default class EdgeComponent extends HTMLElement {
 
     setMiddlePoint(middlePoint:Position){
         this.middlePoint = middlePoint;
-    }
-    
-    attributeChangedCallback(name: any, oldValue: any, newValue: any) {
-        console.log(
-          `Attribute ${name} has changed from ${oldValue} to ${newValue}.`,
-        );
     }
 
     render(){

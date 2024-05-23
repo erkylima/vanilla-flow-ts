@@ -1,7 +1,13 @@
-export function DivBuilder(id:string, className: string): HTMLElement{
-    const doc = document.createElement("div");
+export function ElementBuilder(element: string, content?: any, className?: string, id?:string): HTMLElement{
+    const doc = document.createElement(element);
     doc.className = className;
     doc.id = id;
+    if (content instanceof HTMLElement) {
+        doc.appendChild(content);
+    } else {
+        doc.innerHTML = content;
+    }
+
     return doc;
 }
 

@@ -1,4 +1,5 @@
 import { produce } from "../../util/builder";
+import EdgeComponent from "../EdgeComponent";
 import EdgesBoard from "../EdgesBoard";
 import NodeComponent from "../NodeComponent";
 import NodesBoard from "../NodesBoard";
@@ -383,8 +384,10 @@ class FlowChart extends HTMLElement{
                         x1: x + this.nodesOffsets[nodeIndex].inputs[this.edgesNodes[edgeId].inputIndex].offset.x - this.clickedDelta.x,
                         y1: y + this.nodesOffsets[nodeIndex].inputs[this.edgesNodes[edgeId].inputIndex].offset.y - this.clickedDelta.y,
                     };
-
-                    document.getElementById(edgeId).setAttribute('d', `
+                    alert("#"+ edgeId )
+                    const edge = <EdgeComponent>document.getElementById(edgeId);
+                    alert(edge)
+                    edge.setAttribute('d', `
                     M ${next[edgeId].x0} ${next[edgeId].y0} C ${
                         next[edgeId].x0 + calculateOffset(Math.abs(next[edgeId].x1 - next[edgeId].x0))
                     } ${next[edgeId].y0}, ${next[edgeId].x1 - calculateOffset(Math.abs(next[edgeId].x1 - next[edgeId].x0))} ${
