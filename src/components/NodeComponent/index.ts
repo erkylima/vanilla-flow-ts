@@ -34,7 +34,7 @@ export default class NodeComponent extends HTMLElement {
     outputRefs: HTMLElement[]
     inputs: { offset: { x: number; y: number } }[] = []
     outputs: { offset: { x: number; y: number } }[] = []
-    static observedAttributes = ["inputRefs", "outputRefs"];
+    static observedAttributes = ["x", "y"];
 
     constructor(props: NodeComponentProps) {
         super();
@@ -123,6 +123,7 @@ export default class NodeComponent extends HTMLElement {
 
                 elements.push(element)
             }
+            
             return elements
         }
     }
@@ -175,7 +176,8 @@ export default class NodeComponent extends HTMLElement {
                 // You are now in a hold state, you can do whatever you like!
               }, 500);
             this.props.onMouseDown(ev)
-
+            this.setAttribute("x", ev.x + "")
+            this.setAttribute("y", ev.y + "")
         }));
         content.addEventListener("mouseup", ((ev) => {
 
