@@ -15,14 +15,16 @@ export class App extends HTMLElement {
             inputs: 2,
             outputs: 1,
             x: 200,
-            y: 100
-        })
+            y: 160
+        });
+
         let node2 = new NodeComponent({
             inputs: 1,
             outputs: 2,
             x: 400,
-            y: 200
-        })
+            y: 160
+        });
+        
         this.shadowRoot.appendChild(node1);
         this.shadowRoot.appendChild(node2);
         let edge = new EdgeComponent({startNode: node1, endNode: node2});

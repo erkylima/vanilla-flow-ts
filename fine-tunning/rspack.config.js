@@ -35,6 +35,9 @@ module.exports = {
 	  	rules: [
 			{
 		  	test: /\.css/,			
+			parser: {
+				namedExports: false,
+		  	},
 		  	type: 'css/module',
 			},
 			{

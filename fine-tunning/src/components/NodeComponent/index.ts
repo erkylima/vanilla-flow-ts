@@ -117,7 +117,7 @@ export class NodeComponent extends HTMLElement {
                     z-index: -3;
                     position: absolute;
                     top: 0px;
-                    left: calc(12px * -1.5);
+                    left: calc(12px * -0.6);
                     display: flex;
                     flex-direction: column;
                     margin: 12px 0px;
@@ -125,11 +125,11 @@ export class NodeComponent extends HTMLElement {
                 .input {
                     pointer-events: all;
                     cursor: initial;
-                    background-color: #e38b29;
-                    width: 12px;
+                    background-color: #9c9c9c;
+                    width: 8px;
                     height: 12px;
-                    border-radius: 100%;
-                    margin: 5px 0px;
+                    
+                    margin: 6px 5px 0px 0px;
                     box-shadow: 1px 1px 11px -6px rgba(0, 0, 0, 0.75);
                 }
                 .outputs {
