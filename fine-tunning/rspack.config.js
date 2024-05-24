@@ -12,7 +12,7 @@ module.exports = {
 	mode:'development',
 	devtool: "source-map",
 	resolve: {
-		extensions: ["...", ".ts", ".tsx", ".jsx",".css"]
+		extensions: ["...", ".ts", ".tsx", ".js",".css"]
 	},
 	devServer: {
 		hot: false,
@@ -34,10 +34,7 @@ module.exports = {
 	  	},
 	  	rules: [
 			{
-		  	test: /\.css/,
-		  	parser: {
-				namedExports: false,
-		  	},
+		  	test: /\.css/,			
 		  	type: 'css/module',
 			},
 			{
