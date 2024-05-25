@@ -110,36 +110,37 @@ export class EdgesComponent extends HTMLElement {
 
         if (svgContainer) {
             this.props.actives.forEach((active) => {
-                active.startNode.outputsElement.forEach((outputElement, index) => {
-                    const activeIndex = Math.floor(index / 2);
-                    const active = this.props.actives[activeIndex];
-                    const startRect = active.startNode.outputsElement[index % active.startNode.outputsElement.length].getBoundingClientRect();
-                    const endRect = active.endNode.inputsElement[index % active.endNode.inputsElement.length].getBoundingClientRect();
-
-                    const startX = (startRect.left + startRect.width / 2) - 4;
-                    const startY = (startRect.top + startRect.height / 2);
-
-                    const endX = (endRect.left + endRect.width / 2) - 16;
-                    const endY = (endRect.top + endRect.height / 2);
-
-                    const elementPath = this.createEdgeElementPath();
-                    const elementLine = this.createEdgeElementLine();
-                    let element: SVGLineElement | SVGPathElement;
-                    
-                    if (startY > endY - 50 && startY < endY + 50) {
-                        element = elementLine
-                    } else {
-                        element = elementPath
-                    }
-                    let edgeElement:EdgeExchange = 
-                        {
-                            element: element,
-                            elementPath: elementPath,
-                            elementLine: elementLine
+                active.startNode.outputsElement.forEach((_, index) => {
+                    const inputTarget = active.inputTarget;
+                    const outputTarget = active.outputTarget;
+    
+                    if (index === outputTarget && inputTarget < active.endNode.inputsElement.length) {
+                        const startRect = active.startNode.outputsElement[index].getBoundingClientRect();
+                        const endRect = active.endNode.inputsElement[inputTarget].getBoundingClientRect();
+    
+                        const startX = (startRect.left + startRect.width / 2) - 4;
+                        const startY = (startRect.top + startRect.height / 2);
+    
+                        const endX = (endRect.left + endRect.width / 2) - 16;
+                        const endY = (endRect.top + endRect.height / 2);
+    
+                        const elementPath = this.createEdgeElementPath();
+                        const elementLine = this.createEdgeElementLine();
+                        let element: SVGLineElement | SVGPathElement;
+                        
+                        if (startY > endY - 50 && startY < endY + 50) {
+                            element = elementLine
+                        } else {
+                            element = elementPath
                         }
-                    
-                    svgContainer.appendChild(edgeElement.element);
-                    this.edgeElements.push(edgeElement);
+                        
+                        svgContainer.appendChild(element);
+                        this.edgeElements.push({
+                            element,
+                            elementPath,
+                            elementLine
+                        });
+                    }
                 });
             });
         }
