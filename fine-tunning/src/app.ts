@@ -1,5 +1,5 @@
-import { EdgeComponent } from "./components/EdgesComponent";
-import { NodeProps } from "./components/FlowChart";
+import { EdgesComponent } from "./components/EdgesComponent";
+import { FlowChart, FlowChartConfig } from "./components/FlowChart";
 import { NodeComponent } from "./components/NodeComponent";
 
 export class App extends HTMLElement {
@@ -10,36 +10,28 @@ export class App extends HTMLElement {
 
     connectedCallback(){
         this.attachShadow({mode: 'open'});
-
-        let node1 = new NodeComponent({
-            inputs: 2,
-            outputs: 1,
-            x: 200,
-            y: 160
-        });
-
-        let node2 = new NodeComponent({
-            inputs: 1,
-            outputs: 2,
-            x: 400,
-            y: 160
-        });
-        let node3 = new NodeComponent({
-            inputs: 1,
-            outputs: 2,
-            x: 600,
-            y: 160
-        });
+        const nodesConfig = [
+            { x: 100, y: 160, inputs: 2, outputs: 2 },
+            { x: 300, y: 160, inputs: 2, outputs: 2 },
+            { x: 500, y: 160, inputs: 2, outputs: 2 },
+        ];
         
-        this.shadowRoot.appendChild(node1);
-        this.shadowRoot.appendChild(node2);
-        this.shadowRoot.appendChild(node3);
-        let edge = new EdgeComponent({startNode: node1, endNode: node2});
-        let edge2 = new EdgeComponent({startNode: node2, endNode: node3});
-
-        this.shadowRoot.appendChild(edge);
-        this.shadowRoot.appendChild(edge2);
-        const yourWebComponent = document.querySelector('node-component');
+        const edgesConfig = [
+            { startNodeIndex: 0, endNodeIndex: 1, inputTarget: 0, outputTarget: 0 },
+            { startNodeIndex: 1, endNodeIndex: 2, inputTarget: 0, outputTarget: 0 },
+        ];
+        
+        // Criando o objeto de configuração para o FlowChart
+        const flowChartConfig: FlowChartConfig = {
+            nodes: nodesConfig,
+            edges: edgesConfig,
+        };
+        
+        // Instanciando o FlowChart com os objetos de configuração
+        const flowChart = new FlowChart(flowChartConfig);
+        
+        this.shadowRoot.appendChild(flowChart);
+        
 
 
     }

@@ -1,24 +1,34 @@
 import { NodeComponent } from "../NodeComponent";
 
 export interface EdgeProps {
-    startNode: NodeComponent;
-    endNode: NodeComponent;
+    actives: Array<{
+        startNode: NodeComponent;
+        endNode: NodeComponent;
+        inputTarget: number;
+        outputTarget: number;
+    }>;
 }
 
-export class EdgeComponent extends HTMLElement {
+interface EdgeExchange {
+    element: SVGPathElement | SVGLineElement
+    elementPath: SVGPathElement;
+    elementLine: SVGLineElement;
+}
+
+export class EdgesComponent extends HTMLElement {
     private props: EdgeProps;
-    private edgeElement: SVGPathElement | SVGLineElement;
-    private edgeElementPath: SVGPathElement;
-    private edgeElementLine: SVGLineElement;
+    private edgeElements: Array<EdgeExchange> = [];    
+    
     constructor(props: EdgeProps) {
         super();
         this.props = props;
-        this.edgeElementPath = this.createEdgeElementPath();
-        this.edgeElementLine = this.createEdgeElementLine();
-        this.edgeElement = this.edgeElementLine
         this.render();
-        this.updateEdgePosition();
+        this.updateEdgePositions();
         this.startListening();
+    }
+
+    connectedCallback() {
+        this.updateEdgePositions();
     }
 
     private createEdgeElementPath(): SVGPathElement {
@@ -99,74 +109,98 @@ export class EdgeComponent extends HTMLElement {
         const svgContainer = this.querySelector("svg");
 
         if (svgContainer) {
-            svgContainer.appendChild(this.edgeElement);
+            this.props.actives.forEach((active) => {
+                active.startNode.outputsElement.forEach((outputElement, index) => {
+                    const activeIndex = Math.floor(index / 2);
+                    const active = this.props.actives[activeIndex];
+                    const startRect = active.startNode.outputsElement[index % active.startNode.outputsElement.length].getBoundingClientRect();
+                    const endRect = active.endNode.inputsElement[index % active.endNode.inputsElement.length].getBoundingClientRect();
+
+                    const startX = (startRect.left + startRect.width / 2) - 4;
+                    const startY = (startRect.top + startRect.height / 2);
+
+                    const endX = (endRect.left + endRect.width / 2) - 16;
+                    const endY = (endRect.top + endRect.height / 2);
+
+                    const elementPath = this.createEdgeElementPath();
+                    const elementLine = this.createEdgeElementLine();
+                    let element: SVGLineElement | SVGPathElement;
+                    
+                    if (startY > endY - 50 && startY < endY + 50) {
+                        element = elementLine
+                    } else {
+                        element = elementPath
+                    }
+                    let edgeElement:EdgeExchange = 
+                        {
+                            element: element,
+                            elementPath: elementPath,
+                            elementLine: elementLine
+                        }
+                    
+                    svgContainer.appendChild(edgeElement.element);
+                    this.edgeElements.push(edgeElement);
+                });
+            });
         }
     }
     private calculateOffset(value: number): number {
         return (value * 100) / 200;
     }
 
-    private updateEdgePosition() {
-        const startRect = this.props.startNode.outputsElement[0].getBoundingClientRect();
-        const endRect = this.props.endNode.inputsElement[0].getBoundingClientRect();
+    private updateEdgePositions() {
+        this.edgeElements.forEach((edgeElement, index) => {
+            const activeIndex = Math.floor(index / 2);
+            const active = this.props.actives[activeIndex];
+            const startRect = active.startNode.outputsElement[index % active.startNode.outputsElement.length].getBoundingClientRect();
+            const endRect = active.endNode.inputsElement[index % active.endNode.inputsElement.length].getBoundingClientRect();
 
-        const startX = (startRect.left + startRect.width / 2) - 4;
-        const startY = (startRect.top + startRect.height / 2);
+            const startX = (startRect.left + startRect.width / 2) - 4;
+            const startY = (startRect.top + startRect.height / 2);
 
-        const endX = (endRect.left + endRect.width / 2) - 16;
-        const endY = (endRect.top + endRect.height / 2);
+            const endX = (endRect.left + endRect.width / 2) - 16;
+            const endY = (endRect.top + endRect.height / 2);
 
-        if (startY > endY - 50 && startY < endY + 50) {
-            this.edgeElementLine.setAttribute("x1", startX.toString());
-            this.edgeElementLine.setAttribute("y1", startY.toString());
-            this.edgeElementLine.setAttribute("x2", endX.toString());
-            this.edgeElementLine.setAttribute("y2", endY.toString());            
-            if (this.edgeElement != this.edgeElementLine) {
-                const svgContainer = this.querySelector("svg");
-
-                if (svgContainer) {
-                    svgContainer.removeChild(this.edgeElement);
-                }
-                this.edgeElement = this.edgeElementLine                
-                if (svgContainer) {
-                    svgContainer.appendChild(this.edgeElement);
-                }
+            const svgContainer = this.querySelector("svg");
+            if (svgContainer) {
+                svgContainer.removeChild(edgeElement.element);
             }
-        } else {
-            this.edgeElementPath.setAttribute('d',`
-                M ${startX} ${startY} C ${
-                    startX + this.calculateOffset(Math.abs(endX - startX))
-                } ${startY}, ${endX - this.calculateOffset(Math.abs(endX - startX))} ${
-                    endY
-                }, ${endX} ${endY}
-            `);
-            if (this.edgeElement != this.edgeElementPath) {
-                const svgContainer = this.querySelector("svg");
 
-                if (svgContainer) {
-                    svgContainer.removeChild(this.edgeElement);
-                }
-                this.edgeElement = this.edgeElementPath                
-                if (svgContainer) {
-                    svgContainer.appendChild(this.edgeElement);
-                }
+            if (startY > endY - 50 && startY < endY + 50) {
+                edgeElement.elementLine.setAttribute("x1", startX.toString());
+                edgeElement.elementLine.setAttribute("y1", startY.toString());
+                edgeElement.elementLine.setAttribute("x2", endX.toString());
+                edgeElement.elementLine.setAttribute("y2", endY.toString());
+                edgeElement.element = edgeElement.elementLine
+            } else {
+                edgeElement.elementPath.setAttribute('d',`
+                    M ${startX} ${startY} C ${
+                        startX + this.calculateOffset(Math.abs(endX - startX))
+                    } ${startY}, ${endX - this.calculateOffset(Math.abs(endX - startX))} ${
+                        endY
+                    }, ${endX} ${endY}
+                `);
+                edgeElement.element = edgeElement.elementPath;            
             }
-        }
+
+            if (svgContainer) {
+                svgContainer.append(edgeElement.element);
+            }
+        });
         
-        // this.edgeElement.setAttribute("x1", startX.toString());
-        // this.edgeElement.setAttribute("y1", startY.toString());
-        // this.edgeElement.setAttribute("x2", endX.toString());
-        // this.edgeElement.setAttribute("y2", endY.toString());
+        
     }
 
     private startListening() {
         const observer = new MutationObserver(() => {
-            this.updateEdgePosition();
+            this.updateEdgePositions();
         });
 
-        observer.observe(this.props.startNode, { attributes: true });
-        observer.observe(this.props.endNode, { attributes: true });
+        this.props.actives.forEach(active => {
+            observer.observe(active.startNode, { attributes: true });
+            observer.observe(active.endNode, { attributes: true });
+        });
     }
 }
 
-customElements.define("edge-component", EdgeComponent);
+customElements.define("edge-component", EdgesComponent);
