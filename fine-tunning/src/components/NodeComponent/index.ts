@@ -10,8 +10,8 @@ export interface NodeProps {
 
 export class NodeComponent extends HTMLElement {
     props: NodeProps = {
-        inputs: 2,
-        outputs: 2,
+        inputs: 0,
+        outputs: 0,
         x: 20,
         y: 20,
     }

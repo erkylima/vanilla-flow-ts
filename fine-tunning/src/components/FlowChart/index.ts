@@ -29,8 +29,8 @@ export class FlowChart extends HTMLElement {
             actives: edgesConfig.map(edgeConfig => ({
                 startNode: this.nodes[edgeConfig.startNodeIndex-1],
                 endNode: this.nodes[edgeConfig.endNodeIndex-1],    
-                inputTarget: edgeConfig.inputTarget,
-                outputTarget: edgeConfig.outputTarget,
+                inputTarget: edgeConfig.inputTarget - 1,
+                outputTarget: edgeConfig.outputTarget - 1,
             })),
         };        
 

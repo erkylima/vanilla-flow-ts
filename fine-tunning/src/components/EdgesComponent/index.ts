@@ -116,7 +116,7 @@ export class EdgesComponent extends HTMLElement {
                 active.startNode.outputsElement.forEach((_, index) => {                    
                     
                     if (index === outputTarget && inputTarget < active.endNode.inputsElement.length) {
-                        const startRect = active.startNode.outputsElement[index].getBoundingClientRect();
+                        const startRect = active.startNode.outputsElement[outputTarget].getBoundingClientRect();
                         const endRect = active.endNode.inputsElement[inputTarget].getBoundingClientRect();
     
                         const startX = (startRect.left + startRect.width / 2) - 4;
@@ -155,39 +155,41 @@ export class EdgesComponent extends HTMLElement {
         this.edgeElements.forEach((edgeElement, index) => {
             const activeIndex = index;
             const active = this.props.actives[activeIndex];
-            
-            const startRect = active.startNode.outputsElement[index].getBoundingClientRect();
-            const endRect = active.endNode.inputsElement[active.inputTarget].getBoundingClientRect();
-            const startX = (startRect.left + startRect.width / 2) - 4;
-            const startY = (startRect.top + startRect.height / 2);
+            if (active.outputTarget < active.startNode.outputsElement.length && active.inputTarget < active.endNode.inputsElement.length) {
 
-            const endX = (endRect.left + endRect.width / 2) - 16;
-            const endY = (endRect.top + endRect.height / 2);
+                const startRect = active.startNode.outputsElement[active.outputTarget].getBoundingClientRect();
+                const endRect = active.endNode.inputsElement[active.inputTarget].getBoundingClientRect();
+                const startX = (startRect.left + startRect.width / 2) - 4;
+                const startY = (startRect.top + startRect.height / 2);
 
-            const svgContainer = this.querySelector("svg");
-            if (svgContainer) {
-                svgContainer.removeChild(edgeElement.element);
-            }
+                const endX = (endRect.left + endRect.width / 2) - 16;
+                const endY = (endRect.top + endRect.height / 2);
 
-            if (startY > endY - 50 && startY < endY + 50) {
-                edgeElement.elementLine.setAttribute("x1", startX.toString());
-                edgeElement.elementLine.setAttribute("y1", startY.toString());
-                edgeElement.elementLine.setAttribute("x2", endX.toString());
-                edgeElement.elementLine.setAttribute("y2", endY.toString());
-                edgeElement.element = edgeElement.elementLine
-            } else {
-                edgeElement.elementPath.setAttribute('d',`
-                    M ${startX} ${startY} C ${
-                        startX + this.calculateOffset(Math.abs(endX - startX))
-                    } ${startY}, ${endX - this.calculateOffset(Math.abs(endX - startX))} ${
-                        endY
-                    }, ${endX} ${endY}
-                `);
-                edgeElement.element = edgeElement.elementPath;            
-            }
+                const svgContainer = this.querySelector("svg");
+                if (svgContainer) {
+                    svgContainer.removeChild(edgeElement.element);
+                }
 
-            if (svgContainer) {
-                svgContainer.append(edgeElement.element);
+                if (startY > endY - 50 && startY < endY + 50) {
+                    edgeElement.elementLine.setAttribute("x1", startX.toString());
+                    edgeElement.elementLine.setAttribute("y1", startY.toString());
+                    edgeElement.elementLine.setAttribute("x2", endX.toString());
+                    edgeElement.elementLine.setAttribute("y2", endY.toString());
+                    edgeElement.element = edgeElement.elementLine
+                } else {
+                    edgeElement.elementPath.setAttribute('d',`
+                        M ${startX} ${startY} C ${
+                            startX + this.calculateOffset(Math.abs(endX - startX))
+                        } ${startY}, ${endX - this.calculateOffset(Math.abs(endX - startX))} ${
+                            endY
+                        }, ${endX} ${endY}
+                    `);
+                    edgeElement.element = edgeElement.elementPath;            
+                }
+
+                if (svgContainer) {
+                    svgContainer.append(edgeElement.element);
+                }
             }
         });
         
