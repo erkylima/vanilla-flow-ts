@@ -27,12 +27,13 @@ export class FlowChart extends HTMLElement {
     private initializeEdges(edgesConfig: FlowChartConfig['edges']) {
         const edgeProps: EdgeProps = {
             actives: edgesConfig.map(edgeConfig => ({
-                startNode: this.nodes[edgeConfig.startNodeIndex],
-                endNode: this.nodes[edgeConfig.endNodeIndex],    
+                startNode: this.nodes[edgeConfig.startNodeIndex-1],
+                endNode: this.nodes[edgeConfig.endNodeIndex-1],    
                 inputTarget: edgeConfig.inputTarget,
                 outputTarget: edgeConfig.outputTarget,
             })),
-        };
+        };        
+
         this.edgesComponent = new EdgesComponent(edgeProps);
         this.appendChild(this.edgesComponent);
     }

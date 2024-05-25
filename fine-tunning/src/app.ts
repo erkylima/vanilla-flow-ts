@@ -17,8 +17,8 @@ export class App extends HTMLElement {
         ];
         
         const edgesConfig = [
-            { startNodeIndex: 0, endNodeIndex: 1, inputTarget: 0, outputTarget: 0 },
-            { startNodeIndex: 1, endNodeIndex: 2, inputTarget: 1, outputTarget: 0 },
+            { startNodeIndex: 1, endNodeIndex: 2, inputTarget: 0, outputTarget: 0 },
+            { startNodeIndex: 2, endNodeIndex: 3, inputTarget: 1, outputTarget: 0 },
         ];
         
         // Criando o objeto de configuração para o FlowChart

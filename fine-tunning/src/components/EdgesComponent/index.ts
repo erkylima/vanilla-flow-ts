@@ -110,10 +110,11 @@ export class EdgesComponent extends HTMLElement {
 
         if (svgContainer) {
             this.props.actives.forEach((active) => {
-                active.startNode.outputsElement.forEach((_, index) => {
-                    const inputTarget = active.inputTarget;
-                    const outputTarget = active.outputTarget;
-    
+                const inputTarget = active.inputTarget;
+                const outputTarget = active.outputTarget;
+
+                active.startNode.outputsElement.forEach((_, index) => {                    
+                    
                     if (index === outputTarget && inputTarget < active.endNode.inputsElement.length) {
                         const startRect = active.startNode.outputsElement[index].getBoundingClientRect();
                         const endRect = active.endNode.inputsElement[inputTarget].getBoundingClientRect();
@@ -150,12 +151,13 @@ export class EdgesComponent extends HTMLElement {
     }
 
     private updateEdgePositions() {
+        
         this.edgeElements.forEach((edgeElement, index) => {
-            const activeIndex = Math.floor(index / 2);
+            const activeIndex = index;
             const active = this.props.actives[activeIndex];
-            const startRect = active.startNode.outputsElement[index % active.startNode.outputsElement.length].getBoundingClientRect();
-            const endRect = active.endNode.inputsElement[index % active.endNode.inputsElement.length].getBoundingClientRect();
-
+            
+            const startRect = active.startNode.outputsElement[index].getBoundingClientRect();
+            const endRect = active.endNode.inputsElement[active.inputTarget].getBoundingClientRect();
             const startX = (startRect.left + startRect.width / 2) - 4;
             const startY = (startRect.top + startRect.height / 2);
 
