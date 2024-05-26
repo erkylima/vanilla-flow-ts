@@ -1,3 +1,4 @@
+import { FlowChart } from "../FlowChart";
 import { NodeComponent } from "../NodeComponent";
 
 export interface EdgeProps {
@@ -7,6 +8,7 @@ export interface EdgeProps {
         inputTarget: number;
         outputTarget: number;
     }>;
+    flowchart: FlowChart;
 }
 
 interface EdgeExchange {
@@ -18,7 +20,7 @@ interface EdgeExchange {
 export class EdgesComponent extends HTMLElement {
     private props: EdgeProps;
     private edgeElements: Array<EdgeExchange> = [];    
-    
+
     constructor(props: EdgeProps) {
         super();
         this.props = props;
@@ -92,7 +94,7 @@ export class EdgesComponent extends HTMLElement {
             }
         
         </style>
-        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="100%" height="100vh" class="main">
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" class="main">
             <marker
                 id="arrow"
                 viewBox="0 0 10 10"
@@ -150,7 +152,7 @@ export class EdgesComponent extends HTMLElement {
         return (value * 100) / 200;
     }
 
-    private updateEdgePositions() {
+    updateEdgePositions() {
         
         this.edgeElements.forEach((edgeElement, index) => {
             const activeIndex = index;

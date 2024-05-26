@@ -1,6 +1,5 @@
-import { EdgesComponent } from "./components/EdgesComponent";
 import { FlowChart, FlowChartConfig } from "./components/FlowChart";
-import { NodeComponent } from "./components/NodeComponent";
+
 
 export class App extends HTMLElement {
 
@@ -14,7 +13,7 @@ export class App extends HTMLElement {
             { x: 100, y: 160, inputs: 0, outputs: 2 },
             { x: 300, y: 260, inputs: 1, outputs: 1 },
             { x: 300, y: 60, inputs: 2, outputs: 1 },
-            { x: 600, y: 160, inputs: 2, outputs: 1 },
+            { x: 600, y: 160, inputs: 2 },
         ];
         
         const edgesConfig = [

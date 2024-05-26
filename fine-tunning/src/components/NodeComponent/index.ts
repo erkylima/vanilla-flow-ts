@@ -1,4 +1,5 @@
 import { addClickOutsideListener } from "../../util/builder";
+import { FlowChart } from "../FlowChart";
 
 
 export interface NodeProps {
@@ -6,6 +7,7 @@ export interface NodeProps {
     y?: number;
     inputs?: number;
     outputs?: number;
+    flowChart?: FlowChart;
 }
 
 export class NodeComponent extends HTMLElement {
@@ -14,6 +16,7 @@ export class NodeComponent extends HTMLElement {
         outputs: 0,
         x: 20,
         y: 20,
+
     }
     private offsetX: number = 0;
     private offsetY: number = 0;
@@ -23,13 +26,13 @@ export class NodeComponent extends HTMLElement {
     
     constructor(props: NodeProps) {
         super();
-        
         this.attachShadow({ mode: 'open' });
         this.props = props
         this.setPosition(props.x, props.y)
         this.render();
         this.populateInputPoints(this.props.inputs)
         this.populateOutputPoints(this.props.outputs)
+        this.style.zIndex = "9999"
     }
     
     private isActive: boolean = false;
@@ -187,6 +190,10 @@ export class NodeComponent extends HTMLElement {
 
         window.removeEventListener('mousemove', this.onMouseMove.bind(this));
         window.removeEventListener('mouseup', this.onMouseUp.bind(this));
+    }
+
+    public startDragging(event: MouseEvent) {
+        this.onMouseDown(event);
     }
 }
 
