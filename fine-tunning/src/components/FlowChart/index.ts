@@ -9,70 +9,62 @@ export interface FlowChartConfig {
 export class FlowChart extends HTMLElement {
     private nodes: NodeComponent[] = [];
     private edgesComponent: EdgesComponent | null = null;
-    private scale: number = 1;
-
-    private minScale: number = 0.5;
-    private maxScale: number = 15;
-    private originX: number = 0;
-    private originY: number = 0;
     private board: HTMLElement;
-
-    private isDragging: boolean = false;
-    private nodeDragging: boolean = false;
-
-    private lastMouseX: number = 0;
-    private lastMouseY: number = 0;
-    private dragThreshold: number = 5;
-
+    private scale: number = 1
     constructor(config: FlowChartConfig) {
         super();
+
         this.render();
         this.initializeNodes(config.nodes);
         this.initializeEdges(config.edges);
-        this.addEventListeners();
-
     }
 
-    render() {
+    private render(){   
         this.innerHTML = `
-        <style>
+        <style>                
             .wrapper {
-                position: fixed;
-                width: 100vw;
-                height: 100vh;
-                top: 0px;
-                left: 0px;
-                overflow: scroll;
-            }
-            
-            .board {
+                display: block;
+                overflow: hidden;
+                width: 100%;
+                height: 100%;
                 position: relative;
-                width: 100vw;
-                height: 100vh;
+                border: 1px solid #ccc;
+                cursor: grab;   
+                background-color: white;
                 background-size: 30px 30px;
-                background-image: radial-gradient(circle, #b8b8b8bf 1px, rgba(0, 0, 0, 0) 1px);
-                cursor: grab;
-            }        
+                background-image: radial-gradient(circle, #b8b8b8bf 1px, rgba(0, 0, 0, 0) 1px);                 
+            }
+            .board {
+                transform-origin: 0 0;
+                transition: transform 0.1s ease;
+                width: 100%;
+                height: 100%;
+                position: relative;
+                
+            }
         </style>
-        <div class="wrapper">
+        <div class="wrapper" style="width: 98vw; height: 80vh; ">
             <div class="board">
                 
             </div>
         </div>
-        </div>
-        `;
-        this.board = this.querySelector('.board') as HTMLElement;
+        `
+        const wrapper = this.querySelector('.wrapper') as HTMLDivElement;
+        wrapper.addEventListener('wheel', this.onWheel.bind(this), {passive: false});
+
+        this.board = this.querySelector('.board') as HTMLDivElement
     }
 
     private initializeNodes(nodesConfig: NodeProps[]) {
         nodesConfig.forEach(nodeConfig => {
             const node = new NodeComponent(nodeConfig);
             this.nodes.push(node);
+
             this.board.appendChild(node);
         });
-            
 
     }
+
 
     private initializeEdges(edgesConfig: FlowChartConfig['edges']) {
         const edgeProps: EdgeProps = {
@@ -86,87 +78,20 @@ export class FlowChart extends HTMLElement {
         };        
 
         this.edgesComponent = new EdgesComponent(edgeProps);
-        this.appendChild(this.edgesComponent);
-    } 
-    
-    private addEventListeners() {
-        this.addEventListener('wheel', this.handleWheel.bind(this), { passive: false });
-        this.board.addEventListener('mousedown', this.handleMouseDown.bind(this));
-        this.board.addEventListener('mousemove', this.handleMouseMove.bind(this));
-        this.board.addEventListener('mouseup', this.handleMouseUp.bind(this));
-        this.board.addEventListener('mouseleave', this.handleMouseUp.bind(this));
-
-        // Adicione o evento 'mousedown' para os nós
-        this.nodes.forEach(node => {
-            node.addEventListener('mousedown', this.handleNodeMouseDown.bind(this, node));
-        });
+        this.board.appendChild(this.edgesComponent);
     }
 
-    private handleNodeMouseDown(node: NodeComponent, event: MouseEvent) {
-        event.stopPropagation(); // Impede que o evento 'mousedown' do board seja acionado
-        this.nodeDragging = true;
-        node.startDragging(event); // Chama o método handleMouseDown do nó
-    }    
-    
-    private handleMouseDown(event: MouseEvent) {
-        if (!this.nodeDragging) {
-            event.preventDefault();
-            this.isDragging = true;
-            this.lastMouseX = event.clientX;
-            this.lastMouseY = event.clientY;
-            this.board.style.cursor = 'grabbing';
-        }
-    }
-
-    private handleWheel(event: WheelEvent) {
+    onWheel(event: WheelEvent): void {
         event.preventDefault();
-        const { offsetX, offsetY, deltaY } = event;
-        const scaleChange = deltaY > 0 ? 0.9 : 1.1;
-        const newScale = Math.min(this.maxScale, Math.max(this.minScale, this.scale * scaleChange));
+        const previousZoomLevel = this.scale;
 
-        if (newScale !== this.scale) {
-            const rect = this.board.getBoundingClientRect();
-            const mouseX = offsetX - rect.left;
-            const mouseY = offsetY - rect.top;
-            const dx = mouseX / this.scale;
-            const dy = mouseY / this.scale;
+        this.scale += event.deltaY * -0.01;
+        this.scale = Math.min(Math.max(0.5, this.scale), 2);
 
-            this.originX = this.originX - dx + (dx * newScale / this.scale);
-            this.originY = this.originY - dy + (dy * newScale / this.scale);
-            this.scale = newScale;
+        const scaleChange = this.scale / previousZoomLevel;
+        
 
-            this.updateTransform();
-            this.edgesComponent.updateEdgePositions();
-        }
-    }
-
-
-    private handleMouseMove(event: MouseEvent) {
-        if (this.isDragging && !this.nodeDragging) {
-            event.preventDefault();
-            const deltaX = event.clientX - this.lastMouseX;
-            const deltaY = event.clientY - this.lastMouseY;
-            if (Math.abs(deltaX) > this.dragThreshold || Math.abs(deltaY) > this.dragThreshold) {
-                this.originX += deltaX / this.scale;
-                this.originY += deltaY / this.scale;
-                this.lastMouseX = event.clientX;
-                this.lastMouseY = event.clientY;
-                this.updateTransform();
-                this.edgesComponent.updateEdgePositions();
-            }
-        }
-    }
-    
-
-    private handleMouseUp(event: MouseEvent) {
-        event.preventDefault();
-        this.isDragging = false;
-        this.nodeDragging = false;
-        this.board.style.cursor = 'grab';
-    }
-
-    private updateTransform() {
-        this.board.style.transform = `scale(${this.scale}) translate(${this.originX}px, ${this.originY}px)`;
+        this.board.style.transform = `translate: scale(${scaleChange})`;
     }
 }
 

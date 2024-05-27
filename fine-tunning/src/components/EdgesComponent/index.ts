@@ -59,18 +59,7 @@ export class EdgesComponent extends HTMLElement {
                 top: 0;
                 width: 100%;
                 height: 100%;
-            }
-            
-            .delete {
-                pointer-events: all;
-            }
-            
-            .icon {
-                width: 100px;
-                height: 100px;
-                background-color: white;
-                fill: white;
-            }
+            }                        
             
             .edge {
                 pointer-events: all;
@@ -85,14 +74,7 @@ export class EdgesComponent extends HTMLElement {
                 stroke-width: 3;
                 fill: transparent;
                 z-index: 100;
-            }
-            
-            .edgeNew {
-                stroke: rgba(168, 168, 168, 0.4);
-                stroke-width: 2;
-                fill: transparent;
-            }
-        
+            }                    
         </style>
         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" class="main">
             <marker
@@ -119,22 +101,17 @@ export class EdgesComponent extends HTMLElement {
                     
                     if (index === outputTarget && inputTarget < active.endNode.inputsElement.length) {
                         const startRect = active.startNode.outputsElement[outputTarget].getBoundingClientRect();
-                        const endRect = active.endNode.inputsElement[inputTarget].getBoundingClientRect();
-    
-                        const startX = (startRect.left + startRect.width / 2) - 4;
-                        const startY = (startRect.top + startRect.height / 2);
-    
-                        const endX = (endRect.left + endRect.width / 2) - 16;
-                        const endY = (endRect.top + endRect.height / 2);
-    
+                        const endRect = active.endNode.inputsElement[inputTarget].getBoundingClientRect();    
+                        const startY = (startRect.top + startRect.height / 2);    
+                        const endY = (endRect.top + endRect.height / 2);    
                         const elementPath = this.createEdgeElementPath();
                         const elementLine = this.createEdgeElementLine();
                         let element: SVGLineElement | SVGPathElement;
                         
                         if (startY > endY - 50 && startY < endY + 50) {
-                            element = elementLine
+                            element = elementLine;
                         } else {
-                            element = elementPath
+                            element = elementPath;
                         }
                         
                         svgContainer.appendChild(element);
@@ -158,14 +135,14 @@ export class EdgesComponent extends HTMLElement {
             const activeIndex = index;
             const active = this.props.actives[activeIndex];
             if (active.outputTarget < active.startNode.outputsElement.length && active.inputTarget < active.endNode.inputsElement.length) {
-
                 const startRect = active.startNode.outputsElement[active.outputTarget].getBoundingClientRect();
                 const endRect = active.endNode.inputsElement[active.inputTarget].getBoundingClientRect();
-                const startX = (startRect.left + startRect.width / 2) - 4;
-                const startY = (startRect.top + startRect.height / 2);
-
-                const endX = (endRect.left + endRect.width / 2) - 16;
-                const endY = (endRect.top + endRect.height / 2);
+                const startX = (startRect.left);
+                
+                const startY = (startRect.top - startRect.height/4);
+                
+                const endX = (endRect.left - endRect.width*2);
+                const endY = (endRect.top - endRect.width/3);
 
                 const svgContainer = this.querySelector("svg");
                 if (svgContainer) {
@@ -177,7 +154,7 @@ export class EdgesComponent extends HTMLElement {
                     edgeElement.elementLine.setAttribute("y1", startY.toString());
                     edgeElement.elementLine.setAttribute("x2", endX.toString());
                     edgeElement.elementLine.setAttribute("y2", endY.toString());
-                    edgeElement.element = edgeElement.elementLine
+                    edgeElement.element = edgeElement.elementLine;
                 } else {
                     edgeElement.elementPath.setAttribute('d',`
                         M ${startX} ${startY} C ${
@@ -194,8 +171,6 @@ export class EdgesComponent extends HTMLElement {
                 }
             }
         });
-        
-        
     }
 
     private startListening() {
