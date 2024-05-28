@@ -46,7 +46,6 @@ export class FlowChart extends HTMLElement {
             }
             .board {
                 transform-origin: 0 0;
-                transition: transform 0.1s ease;
                 width: 100%;
                 height: 100%;
                 position: relative;
@@ -63,7 +62,7 @@ export class FlowChart extends HTMLElement {
         this.board = this.querySelector('.board') as HTMLDivElement;
         this.wrapper = this.querySelector('.wrapper') as HTMLDivElement;
         this.board.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
-        this.board.addEventListener('mousedown', this.onMouseDown.bind(this));
+        this.wrapper.addEventListener('mousedown', this.onMouseDown.bind(this));
         window.addEventListener('mouseup', this.onMouseUp.bind(this));
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
     }
@@ -122,6 +121,7 @@ export class FlowChart extends HTMLElement {
         this.isPanning = true;
         this.startX = event.clientX;
         this.startY = event.clientY;
+
         this.board.classList.add('grabbing');
     }
 
@@ -141,9 +141,8 @@ export class FlowChart extends HTMLElement {
 
     private onMouseUp(event: MouseEvent): void {
         this.isPanning = false;
-        this.board.classList.remove('grabbing');
+        // this.board.classList.remove('grabbing');
         this.isDraggingNode = false;
-
     }
 
     updateTransform() {
