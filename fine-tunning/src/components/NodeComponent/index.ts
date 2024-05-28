@@ -161,25 +161,31 @@ export class NodeComponent extends HTMLElement {
             <p>Text</p>
         `;
     }
-
+    updateNodePosition(){
+        // this.style.transform = `translate(${this.props.flowChart.translateX}px, ${this.props.flowChart.translateY}px) scale(${this.props.flowChart.scale})`;
+    }
     private onMouseDown(event: MouseEvent) {
         event.preventDefault();
         this.isDragging = true;
 
         const rect = this.getBoundingClientRect();
-        this.offsetX = event.clientX - rect.left;
-        this.offsetY = event.clientY - rect.top;
+        this.offsetX = event.clientX - rect.left ;
+        this.offsetY = event.clientY - rect.top ;
 
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
         window.addEventListener('mouseup', this.onMouseUp.bind(this));
+
+        // Notificar o FlowChart de que um nó está sendo arrastado
+        if (this.props.flowChart) {
+            this.props.flowChart.notifyNodeDragging(true);
+        }
     }
 
     private onMouseMove(event: MouseEvent) {
         if (!this.isDragging) return;
-
         const newX = event.clientX - this.offsetX;
         const newY = event.clientY - this.offsetY;
-
+        
         this.setPosition(newX, newY);
     }
 
