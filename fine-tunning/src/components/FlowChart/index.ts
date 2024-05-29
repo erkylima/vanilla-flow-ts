@@ -82,16 +82,16 @@ export class FlowChart extends HTMLElement {
                 startNode: this.nodes[edgeConfig.startNodeIndex - 1],
                 endNode: this.nodes[edgeConfig.endNodeIndex - 1],
                 inputTarget: edgeConfig.inputTarget - 1,
-                outputTarget: edgeConfig.outputTarget - 1,
+                outputTarget: edgeConfig.outputTarget - 1
             })),
-            flowchart: this,
-        };        
+            flowchart: this
+        };
 
         this.edgesComponent = new EdgesComponent(edgeProps);
         this.board.appendChild(this.edgesComponent);
     }
 
-    private onWheel(event: WheelEvent): void {        
+    private onWheel(event: WheelEvent): void {
         event.preventDefault();
     
         const { offsetX, offsetY, deltaY } = event;
@@ -108,9 +108,9 @@ export class FlowChart extends HTMLElement {
         this.translateY -= originDeltaY * (newScale / this.scale - 1);
 
         this.scale = newScale;
-        this.edgesComponent.updateEdgePositions();
-
         this.updateTransform();
+
+        this.edgesComponent.updateEdgePositions();
     }
 
     public notifyNodeDragging(isDragging: boolean): void {
@@ -134,9 +134,10 @@ export class FlowChart extends HTMLElement {
 
         this.translateX += deltaX;
         this.translateY += deltaY;
+        this.updateTransform();
+
         this.edgesComponent.updateEdgePositions();
 
-        this.updateTransform();
     }
 
     private onMouseUp(event: MouseEvent): void {

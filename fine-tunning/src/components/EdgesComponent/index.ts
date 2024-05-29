@@ -136,12 +136,12 @@ export class EdgesComponent extends HTMLElement {
             if (active.outputTarget < active.startNode.outputsElement.length && active.inputTarget < active.endNode.inputsElement.length) {
                 const startRect = active.startNode.outputsElement[active.outputTarget].getBoundingClientRect();
                 const endRect = active.endNode.inputsElement[active.inputTarget].getBoundingClientRect();
-                const startX = (startRect.left - this.props.flowchart.translateX);
                 
+                const startX = (startRect.left - this.props.flowchart.translateX)
                 const startY = (startRect.top - startRect.height/4) - this.props.flowchart.translateY;
                 
-                const endX = (endRect.left - endRect.width*2) - this.props.flowchart.translateX;
-                const endY = (endRect.top - endRect.width/3) - this.props.flowchart.translateY;
+                const endX = (endRect.left - (endRect.width*2)) - this.props.flowchart.translateX;
+                const endY = (endRect.top - (endRect.width/3))  - this.props.flowchart.translateY;
 
                 const svgContainer = this.querySelector("svg");
                 if (svgContainer) {
