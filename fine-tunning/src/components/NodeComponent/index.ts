@@ -167,8 +167,8 @@ export class NodeComponent extends HTMLElement {
         this.isDragging = true;
 
         const rect = this.getBoundingClientRect();
-        this.offsetX = (((event.clientX - rect.left)) + this.props.flowChart.translateX);
-        this.offsetY = (((event.clientY - rect.top)) + this.props.flowChart.translateY);
+        this.offsetX = (((event.clientX - rect.left)) + this.props.flowChart.translateX );
+        this.offsetY = (((event.clientY - rect.top)) + this.props.flowChart.translateY );
 
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
         window.addEventListener('mouseup', this.onMouseUp.bind(this));

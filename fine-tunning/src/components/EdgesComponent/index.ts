@@ -35,8 +35,8 @@ export class EdgesComponent extends HTMLElement {
 
     private createEdgeElementPath(): SVGPathElement {
         const edge = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        edge.setAttribute("class", "edge")
-        edge.setAttribute("marker-end", "url(#arrow)")
+        edge.setAttribute("class", "edge");
+        edge.setAttribute("marker-end", "url(#arrow)");
 
         return edge;
     }
@@ -47,16 +47,16 @@ export class EdgesComponent extends HTMLElement {
         edge.setAttribute("stroke", "rgba(168, 168, 168, 0.8)");
         edge.setAttribute("stroke-width", "2");
         edge.setAttribute("fill", "transparent");
-        edge.setAttribute("marker-end", "url(#arrow)")
+        edge.setAttribute("marker-end", "url(#arrow)");
         return edge;
     }
+
     private render() {
         this.innerHTML = `
         <style>
             .main {
                 pointer-events: none;
                 position: absolute;
-                top: 0;
                 width: 100%;
                 height: 100%;
             }                        
@@ -125,6 +125,7 @@ export class EdgesComponent extends HTMLElement {
             });
         }
     }
+
     private calculateOffset(value: number): number {
         return (value * 100) / 200;
     }
@@ -137,11 +138,11 @@ export class EdgesComponent extends HTMLElement {
                 const startRect = active.startNode.outputsElement[active.outputTarget].getBoundingClientRect();
                 const endRect = active.endNode.inputsElement[active.inputTarget].getBoundingClientRect();
                 
-                const startX = (startRect.left - this.props.flowchart.translateX)
-                const startY = (startRect.top - startRect.height/4) - this.props.flowchart.translateY;
+                const startX = ((startRect.left - this.props.flowchart.translateX))
+                const startY = ((startRect.top - startRect.height/4)) - this.props.flowchart.translateY;
                 
-                const endX = (endRect.left - (endRect.width*2)) - this.props.flowchart.translateX;
-                const endY = (endRect.top - (endRect.width/3))  - this.props.flowchart.translateY;
+                const endX = ((endRect.left - (endRect.width*2))) - this.props.flowchart.translateX;
+                const endY = ((endRect.top - (endRect.width/3)))  - this.props.flowchart.translateY;
 
                 const svgContainer = this.querySelector("svg");
                 if (svgContainer) {

@@ -36,19 +36,20 @@ export class FlowChart extends HTMLElement {
                 height: 100%;
                 position: relative;
                 border: 1px solid #ccc;
-                cursor: grab;   
-                background-color: white;
+                cursor: grab;                   
                 background-size: 30px 30px;
-                background-image: radial-gradient(circle, #b8b8b8bf 1px, rgba(0, 0, 0, 0) 1px);                 
+                background-image: radial-gradient(circle, #b8b8b8bf 1px, rgba(0, 0, 0, 0) 1px);
             }
             .wrapper:active {
                 cursor: grabbing;
             }
             .board {
-                transform-origin: 0 0;
                 width: 100%;
                 height: 100%;
-                position: relative;
+                position: absolute;
+                top: 0;
+                left: 0;
+                
             }
             .grabbing {
                 cursor: grabbing;
@@ -61,10 +62,11 @@ export class FlowChart extends HTMLElement {
         
         this.board = this.querySelector('.board') as HTMLDivElement;
         this.wrapper = this.querySelector('.wrapper') as HTMLDivElement;
-        this.board.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
         this.wrapper.addEventListener('mousedown', this.onMouseDown.bind(this));
         window.addEventListener('mouseup', this.onMouseUp.bind(this));
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
+        this.wrapper.addEventListener('wheel', this.onMouseWheel.bind(this));
+
     }
 
     private initializeNodes(nodesConfig: NodeProps[]) {
@@ -91,15 +93,19 @@ export class FlowChart extends HTMLElement {
         this.board.appendChild(this.edgesComponent);
     }
 
-    private onWheel(event: WheelEvent): void {
+
+    public notifyNodeDragging(isDragging: boolean): void {
+        this.isDraggingNode = isDragging;
+    }
+    private onMouseWheel(event: WheelEvent): void {
         event.preventDefault();
     
         const { offsetX, offsetY, deltaY } = event;
-        const zoomFactor = 0.05;
+        const zoomFactor = 0.1;
         const newScale = this.scale * (deltaY > 0 ? (1 - zoomFactor) : (1 + zoomFactor));
 
         // Limit the scale to avoid too much zooming in or out
-        if (newScale < 0.7 || newScale > 1.5) return;
+        if (newScale < 0.5 || newScale > 2) return;
 
         // Adjust origin to zoom around the mouse position
         const originDeltaX = offsetX - this.translateX;
@@ -108,14 +114,11 @@ export class FlowChart extends HTMLElement {
         this.translateY -= originDeltaY * (newScale / this.scale - 1);
 
         this.scale = newScale;
+
         this.updateTransform();
-
-        this.edgesComponent.updateEdgePositions();
     }
 
-    public notifyNodeDragging(isDragging: boolean): void {
-        this.isDraggingNode = isDragging;
-    }
+
     
     private onMouseDown(event: MouseEvent): void {
         this.isPanning = true;
@@ -123,6 +126,7 @@ export class FlowChart extends HTMLElement {
         this.startY = event.clientY;
 
         this.board.classList.add('grabbing');
+        event.stopPropagation();
     }
 
     private onMouseMove(event: MouseEvent): void {
@@ -134,21 +138,23 @@ export class FlowChart extends HTMLElement {
 
         this.translateX += deltaX;
         this.translateY += deltaY;
+
+        if (this.translateX > 0) this.translateX = 0;
+        if (this.translateY > 0) this.translateY = 0;
+
         this.updateTransform();
-
-        this.edgesComponent.updateEdgePositions();
-
     }
 
     private onMouseUp(event: MouseEvent): void {
         this.isPanning = false;
-        // this.board.classList.remove('grabbing');
+        this.board.classList.remove('grabbing');
         this.isDraggingNode = false;
     }
 
     updateTransform() {
         this.board.style.transform = `translate(${this.translateX}px, ${this.translateY}px) scale(${this.scale})`;
-        this.wrapper.style.backgroundSize = `translate(${30 * this.scale}px, ${30 * this.scale})`;        
+        this.wrapper.style.backgroundPositionX = this.translateX+"px";
+        this.wrapper.style.backgroundPositionY = this.translateY+"px";        
     }
 
    
