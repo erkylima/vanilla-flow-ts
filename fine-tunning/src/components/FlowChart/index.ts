@@ -124,6 +124,8 @@ export class FlowChart extends HTMLElement {
 
     
     private onMouseDown(event: MouseEvent): void {
+        // alert(event.clientX + "board")
+
         if (event.button !== 2) return; // Only handle right mouse button
 
         this.isPanning = true;
@@ -160,7 +162,7 @@ export class FlowChart extends HTMLElement {
     updateTransform() {
         this.board.style.transform = `translate(${this.translateX}px, ${this.translateY}px) scale(${this.scale})`;
         this.wrapper.style.backgroundPositionX = this.translateX+"px";
-        this.wrapper.style.backgroundPositionY = this.translateY+"px";        
+        this.wrapper.style.backgroundPositionY = this.translateY+"px";  
     }
 
    

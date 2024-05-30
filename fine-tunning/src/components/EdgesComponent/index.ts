@@ -91,7 +91,7 @@ export class EdgesComponent extends HTMLElement {
         </svg>
         `
         const svgContainer = this.querySelector("svg");
-
+        
         if (svgContainer) {
             this.props.actives.forEach((active) => {
                 const inputTarget = active.inputTarget;
@@ -131,24 +131,28 @@ export class EdgesComponent extends HTMLElement {
     }
 
     updateEdgePositions() {
+        const scale = this.props.flowchart.scale;
+        const translateX = this.props.flowchart.translateX;
+        const translateY = this.props.flowchart.translateY;
+    
         this.edgeElements.forEach((edgeElement, index) => {
             const activeIndex = index;
             const active = this.props.actives[activeIndex];
             if (active.outputTarget < active.startNode.outputsElement.length && active.inputTarget < active.endNode.inputsElement.length) {
                 const startRect = active.startNode.outputsElement[active.outputTarget].getBoundingClientRect();
                 const endRect = active.endNode.inputsElement[active.inputTarget].getBoundingClientRect();
-                
-                const startX = ((startRect.left - this.props.flowchart.translateX))
-                const startY = ((startRect.top - startRect.height/4)) - this.props.flowchart.translateY;
-                
-                const endX = ((endRect.left - (endRect.width*2))) - this.props.flowchart.translateX;
-                const endY = ((endRect.top - (endRect.width/3)))  - this.props.flowchart.translateY;
-
+    
+                const startX = (startRect.left - translateX) * scale;
+                const startY = (startRect.top - translateY) * scale;
+    
+                const endX = (endRect.left - (endRect.width * 2) - translateX) * scale;
+                const endY = (endRect.top - (endRect.width / 3) - translateY) * scale;
+    
                 const svgContainer = this.querySelector("svg");
                 if (svgContainer) {
                     svgContainer.removeChild(edgeElement.element);
                 }
-
+    
                 if (startY > endY - 50 && startY < endY + 50) {
                     edgeElement.elementLine.setAttribute("x1", startX.toString());
                     edgeElement.elementLine.setAttribute("y1", startY.toString());
@@ -156,22 +160,23 @@ export class EdgesComponent extends HTMLElement {
                     edgeElement.elementLine.setAttribute("y2", endY.toString());
                     edgeElement.element = edgeElement.elementLine;
                 } else {
-                    edgeElement.elementPath.setAttribute('d',`
+                    edgeElement.elementPath.setAttribute('d', `
                         M ${startX} ${startY} C ${
                             startX + this.calculateOffset(Math.abs(endX - startX))
                         } ${startY}, ${endX - this.calculateOffset(Math.abs(endX - startX))} ${
                             endY
                         }, ${endX} ${endY}
                     `);
-                    edgeElement.element = edgeElement.elementPath;            
+                    edgeElement.element = edgeElement.elementPath;
                 }
-
+    
                 if (svgContainer) {
                     svgContainer.append(edgeElement.element);
                 }
             }
         });
     }
+    
 
     private startListening() {
         const observer = new MutationObserver(() => {

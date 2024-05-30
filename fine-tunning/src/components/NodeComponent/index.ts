@@ -75,8 +75,9 @@ export class NodeComponent extends HTMLElement {
     }
 
     setPosition(x: number, y: number) {
-        this.style.left = x + 'px';
-        this.style.top = y + 'px';
+        const scale = this.props.flowChart.scale
+        this.style.left = (x * scale + (this.props.flowChart.translateX * -1))+ 'px';
+        this.style.top = (y * scale + (this.props.flowChart.translateY * -1)) + 'px';
     }
 
     private render() {
@@ -165,10 +166,10 @@ export class NodeComponent extends HTMLElement {
     private onMouseDown(event: MouseEvent) {
         event.preventDefault();
         this.isDragging = true;
-
         const rect = this.getBoundingClientRect();
-        this.offsetX = (((event.clientX - rect.left)) + this.props.flowChart.translateX );
-        this.offsetY = (((event.clientY - rect.top)) + this.props.flowChart.translateY );
+        this.offsetX = ((event.clientX - rect.left) );
+        this.offsetY = ((event.clientY - rect.top) );
+        // alert(event.clientX + "node")
 
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
         window.addEventListener('mouseup', this.onMouseUp.bind(this));
@@ -181,8 +182,8 @@ export class NodeComponent extends HTMLElement {
 
     private onMouseMove(event: MouseEvent) {
         if (!this.isDragging) return;
-        const newX = (event.clientX - this.offsetX);
-        const newY = (event.clientY - this.offsetY);
+        const newX = (event.clientX - this.offsetX) ;
+        const newY = (event.clientY - this.offsetY) ;
         this.setPosition(newX, newY);
     }
 
