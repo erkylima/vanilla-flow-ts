@@ -22,6 +22,7 @@ export class FlowChart extends HTMLElement {
     constructor(config: FlowChartConfig) {
         super();
         this.render();
+        this.addEventListener('contextmenu', (e) => e.preventDefault());
         this.initializeNodes(config.nodes);
         this.initializeEdges(config.edges);
     }
@@ -110,9 +111,11 @@ export class FlowChart extends HTMLElement {
         // Adjust origin to zoom around the mouse position
         const originDeltaX = offsetX - this.translateX;
         const originDeltaY = offsetY - this.translateY;
+        
         this.translateX -= originDeltaX * (newScale / this.scale - 1);
         this.translateY -= originDeltaY * (newScale / this.scale - 1);
-
+        if (this.translateX > 0) this.translateX = 0;
+        if (this.translateY > 0) this.translateY = 0;
         this.scale = newScale;
 
         this.updateTransform();
@@ -121,6 +124,8 @@ export class FlowChart extends HTMLElement {
 
     
     private onMouseDown(event: MouseEvent): void {
+        if (event.button !== 2) return; // Only handle right mouse button
+
         this.isPanning = true;
         this.startX = event.clientX;
         this.startY = event.clientY;
@@ -131,6 +136,7 @@ export class FlowChart extends HTMLElement {
 
     private onMouseMove(event: MouseEvent): void {
         if (!this.isPanning || this.isDraggingNode) return;
+        event.preventDefault();
         const deltaX = event.clientX - this.startX;
         const deltaY = event.clientY - this.startY;
         this.startX = event.clientX;
