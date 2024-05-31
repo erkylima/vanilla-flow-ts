@@ -47,7 +47,7 @@ export class FlowChart extends HTMLElement {
             .board {
                 width: 100%;
                 height: 100%;
-                position: absolute;
+                position: relative;
                 top: 0;
                 left: 0;
                 
@@ -147,8 +147,8 @@ export class FlowChart extends HTMLElement {
         this.translateX += deltaX;
         this.translateY += deltaY;
 
-        if (this.translateX > 0) this.translateX = 0;
-        if (this.translateY > 0) this.translateY = 0;
+        // if (this.translateX > 0) this.translateX = 0;
+        // if (this.translateY > 0) this.translateY = 0;
 
         this.updateTransform();
     }
@@ -161,8 +161,11 @@ export class FlowChart extends HTMLElement {
 
     updateTransform() {
         this.board.style.transform = `translate(${this.translateX}px, ${this.translateY}px) scale(${this.scale})`;
+        
+        
         this.wrapper.style.backgroundPositionX = this.translateX+"px";
         this.wrapper.style.backgroundPositionY = this.translateY+"px";  
+        this.nodes.forEach(node => {node.setPosition(node.props.x,node.props.y);});
     }
 
    

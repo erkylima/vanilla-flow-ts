@@ -18,6 +18,10 @@ export class NodeComponent extends HTMLElement {
     };
     private offsetX: number = 0;
     private offsetY: number = 0;
+    private initialX: number = 0;
+    private initialY: number = 0;
+    private initialNodeX: number = 0;
+    private initialNodeY: number = 0;
     inputsElement: Array<HTMLElement> = new Array<HTMLElement>();
     outputsElement: Array<HTMLElement> = new Array<HTMLElement>();
     private isDragging: boolean = false;
@@ -75,9 +79,8 @@ export class NodeComponent extends HTMLElement {
     }
 
     setPosition(x: number, y: number) {
-        const scale = this.props.flowChart.scale
-        this.style.left = (x * scale + (this.props.flowChart.translateX * -1))+ 'px';
-        this.style.top = (y * scale + (this.props.flowChart.translateY * -1)) + 'px';
+        this.style.left = x + 'px';
+        this.style.top = y + 'px';
     }
 
     private render() {
@@ -167,9 +170,12 @@ export class NodeComponent extends HTMLElement {
         event.preventDefault();
         this.isDragging = true;
         const rect = this.getBoundingClientRect();
-        this.offsetX = ((event.clientX - rect.left) );
-        this.offsetY = ((event.clientY - rect.top) );
-        // alert(event.clientX + "node")
+        this.offsetX = (event.clientX - rect.left) ;
+        this.offsetY = (event.clientY - rect.top) ;    
+        this.initialX = event.clientX;
+        this.initialY = event.clientY;
+        this.initialNodeX = this.props.x
+        this.initialNodeY = this.props.y
 
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
         window.addEventListener('mouseup', this.onMouseUp.bind(this));
@@ -182,15 +188,22 @@ export class NodeComponent extends HTMLElement {
 
     private onMouseMove(event: MouseEvent) {
         if (!this.isDragging) return;
-        const newX = (event.clientX - this.offsetX) ;
-        const newY = (event.clientY - this.offsetY) ;
-        this.setPosition(newX, newY);
+        const dx = (event.clientX - this.initialX)/this.props.flowChart.scale 
+        const dy = (event.clientY - this.initialY)/this.props.flowChart.scale        
+        this.props.x = this.initialNodeX + dx;
+        this.props.y = this.initialNodeY + dy;
+        this.setPosition(this.props.x, this.props.y);
     }
 
     private onMouseUp(event: MouseEvent) {
         if (!this.isDragging) return;
         this.isDragging = false;
-
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.initialNodeX = 0;
+        this.initialNodeY = 0;
+        this.initialX = 0;
+        this.initialY = 0;
         window.removeEventListener('mousemove', this.onMouseMove.bind(this));
         window.removeEventListener('mouseup', this.onMouseUp.bind(this));
     }
