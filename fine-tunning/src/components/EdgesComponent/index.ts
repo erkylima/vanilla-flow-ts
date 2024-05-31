@@ -57,8 +57,9 @@ export class EdgesComponent extends HTMLElement {
             .main {
                 pointer-events: none;
                 position: absolute;
-                width: 100%;
-                height: 100%;
+                width: 3000px;
+                height: 3000px;
+                
             }                        
             
             .edge {

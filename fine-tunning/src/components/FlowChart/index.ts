@@ -106,7 +106,7 @@ export class FlowChart extends HTMLElement {
         const newScale = this.scale * (deltaY > 0 ? (1 - zoomFactor) : (1 + zoomFactor));
 
         // Limit the scale to avoid too much zooming in or out
-        if (newScale < 0.5 || newScale > 2) return;
+        if (newScale < 0.1 || newScale > 3) return;
 
         // Adjust origin to zoom around the mouse position
         const originDeltaX = offsetX - this.translateX;
@@ -114,8 +114,8 @@ export class FlowChart extends HTMLElement {
         
         this.translateX -= originDeltaX * (newScale / this.scale - 1);
         this.translateY -= originDeltaY * (newScale / this.scale - 1);
-        if (this.translateX > 0) this.translateX = 0;
-        if (this.translateY > 0) this.translateY = 0;
+        // if (this.translateX > 0) this.translateX = 0;
+        // if (this.translateY > 0) this.translateY = 0;
         this.scale = newScale;
 
         this.updateTransform();
