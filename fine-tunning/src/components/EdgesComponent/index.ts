@@ -141,14 +141,15 @@ export class EdgesComponent extends HTMLElement {
             if (active.outputTarget < active.startNode.outputsElement.length && active.inputTarget < active.endNode.inputsElement.length) {
                 const startRect = active.startNode.outputsElement[active.outputTarget].getBoundingClientRect();
                 const endRect = active.endNode.inputsElement[active.inputTarget].getBoundingClientRect();
-    
-                const startX = (startRect.left - translateX) * scale;
-                const startY = (startRect.top - translateY) * scale;
-    
-                const endX = (endRect.left - (endRect.width * 2) - translateX) * scale;
-                const endY = (endRect.top - (endRect.width / 3) - translateY) * scale;
-    
+                
+                const startX = (startRect.left + (startRect.width ) - this.getBoundingClientRect().left) / scale;
+                const startY = (startRect.top + (startRect.height / 2) -this.getBoundingClientRect().top) / scale;
+                
+                const endX = (endRect.left - this.getBoundingClientRect().left - (endRect.width )) / scale ;
+                const endY = (endRect.top + (endRect.height / 2) - this.getBoundingClientRect().top ) / scale;
+                
                 const svgContainer = this.querySelector("svg");
+                
                 if (svgContainer) {
                     svgContainer.removeChild(edgeElement.element);
                 }

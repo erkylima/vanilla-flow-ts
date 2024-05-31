@@ -2,6 +2,7 @@ import { addClickOutsideListener } from "../../util/builder";
 import { FlowChart } from "../FlowChart";
 
 export interface NodeProps {
+    id?: number;
     x?: number;
     y?: number;
     inputs?: number;
@@ -28,7 +29,7 @@ export class NodeComponent extends HTMLElement {
 
     constructor(props: NodeProps) {
         super();
-        
+        this.id = props.id +"";
         this.attachShadow({ mode: 'open' });
         this.props = props;
         this.setPosition(props.x, props.y);
@@ -123,11 +124,11 @@ export class NodeComponent extends HTMLElement {
                 .inputs {
                     pointer-events: none;
                     cursor: initial;
-                    z-index: -3;
                     position: absolute;                    
-                    left: calc(12px * -0.1);                                        
-                    position: absolute;
-                    top: calc(50% - 3px );
+                    left: calc(12px * -0.1);
+                    display: flex;
+                    flex-direction: column;
+                    top: 50%;
                     transform: translate(-50%,-50%);
                     }
                 .input {
@@ -136,7 +137,7 @@ export class NodeComponent extends HTMLElement {
                     background-color: #9c9c9c;
                     width: 6px;
                     height: 12px;
-                    margin: 6px 6px 0px 0px;
+                    margin: 6px 0px;
                     box-shadow: 1px 1px 11px -6px rgba(0, 0, 0, 0.75);
                 }
                 .outputs {
