@@ -151,28 +151,45 @@ export class EdgesComponent extends HTMLElement {
 
                 // Calcule a largura e a altura do contêiner
                 const width = Math.abs(endX - startX);
-                const height = Math.abs(endY - startY);
+                let height = Math.abs(endY - startY);
 
-                elementContainer.style.left = `${Math.min(startX, endX  )}px`;
-                elementContainer.style.top = `${Math.min(startY, endY)}px`;
-                elementContainer.style.width = `${width + 20}px`;
-                elementContainer.style.height = `${height + 20}px`;
+                // Ajuste a altura mínima do contêiner para a altura do marker
+                const minHeight = this.markerSize + 10;
+                if (height < minHeight) {
+                    height = minHeight;
+                }
 
+                // Calcule as margens de 5%
+                const marginX = width * 0.40;
+                const marginY = height * 0.40;
+
+                
+
+                elementContainer.style.left = `${Math.min(startX, endX) - marginX}px`;
+                elementContainer.style.top = `${Math.min(startY, endY) - marginY}px`;
+                elementContainer.style.width = `${width + 2 * marginX}px`;
+                elementContainer.style.height = `${height + 2 * marginY}px`;
+
+                 // Ajuste as coordenadas dos elementos internos
+                const adjustedStartX = (startX - Math.min(startX, endX) + marginX);
+                const adjustedStartY = (startY - Math.min(startY, endY) + marginY);
+                const adjustedEndX = (endX - Math.min(startX, endX) + marginX - this.markerSize / scale);
+                const adjustedEndY = (endY - Math.min(startY, endY) + marginY);
+            
                 if (startY > endY - 50 && startY < endY + 50) {
-                    edgeElement.elementLine.setAttribute("x1", (startX - Math.min(startX, endX)).toString());
-                    edgeElement.elementLine.setAttribute("y1", (startY - Math.min(startY, endY)).toString());
-                    edgeElement.elementLine.setAttribute("x2", (endX - Math.min(startX, endX) - this.markerSize / scale).toString());
-                    edgeElement.elementLine.setAttribute("y2", (endY - Math.min(startY, endY)).toString());
+                    edgeElement.elementLine.setAttribute("x1", adjustedStartX.toString());
+                edgeElement.elementLine.setAttribute("y1", adjustedStartY.toString());
+                edgeElement.elementLine.setAttribute("x2", adjustedEndX.toString());
+                edgeElement.elementLine.setAttribute("y2", adjustedEndY.toString());
                     edgeElement.elementContainer.removeChild(edgeElement.element);
                     edgeElement.element = edgeElement.elementLine
                     edgeElement.elementContainer.appendChild(edgeElement.element);
                 } else {
                     edgeElement.elementPath.setAttribute('d', `
-                        M ${(startX - Math.min(startX, endX))} ${(startY - Math.min(startY, endY))} C ${
-                        (startX - Math.min(startX, endX)) + this.calculateOffset(Math.abs(endX - startX))
-                    } ${(startY - Math.min(startY, endY))}, ${(endX - Math.min(startX, endX) - this.markerSize / scale) - this.calculateOffset(Math.abs(endX - startX))} ${
-                        (endY - Math.min(startY, endY))
-                    }, ${(endX - Math.min(startX, endX) - this.markerSize / scale)} ${(endY - Math.min(startY, endY))}
+                        M ${adjustedStartX} ${adjustedStartY} 
+                        C ${adjustedStartX + this.calculateOffset(Math.abs(endX - startX))} ${adjustedStartY}, 
+                        ${adjustedEndX - this.calculateOffset(Math.abs(endX - startX))} ${adjustedEndY}, 
+                        ${adjustedEndX} ${adjustedEndY}
                     `);
                     edgeElement.elementContainer.removeChild(edgeElement.element)
                     edgeElement.element = edgeElement.elementPath
