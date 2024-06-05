@@ -19,7 +19,7 @@ interface EdgeExchange {
 }
 
 export class EdgesComponent extends HTMLElement {
-    private props: EdgeProps;
+    props: EdgeProps;
     private edgeElements: Array<EdgeExchange> = [];
     private markerSize = 6; // Tamanho do marker
 
@@ -35,14 +35,14 @@ export class EdgesComponent extends HTMLElement {
         this.updateEdgePositions();
     }
 
-    private createEdgeElementPath(): SVGPathElement {
+    createEdgeElementPath(): SVGPathElement {
         const edge = document.createElementNS("http://www.w3.org/2000/svg", "path");
         edge.setAttribute("class", "edge");
         edge.setAttribute("marker-end", "url(#arrow)");
         return edge;
     }
 
-    private createEdgeElementLine(): SVGLineElement {
+    createEdgeElementLine(): SVGLineElement {
         const edge = document.createElementNS("http://www.w3.org/2000/svg", "line");
         edge.setAttribute("class", "edge");
         edge.setAttribute("stroke", "rgba(168, 168, 168, 0.8)");
@@ -122,10 +122,48 @@ export class EdgesComponent extends HTMLElement {
                     }
                 });
             });
+            
+            // Add New Edge Element
+            const elementNewEdgePath = this.createEdgeElementPath();
+            const elementNewEdgeLine = this.createEdgeElementLine();
+            let elementNewEdge: SVGLineElement | SVGPathElement;
+
+            const edgeNewEdgeContainer = document.createElementNS
+            ('http://www.w3.org/2000/svg', 'svg');;
+            edgeNewEdgeContainer.setAttribute('xmlns', "http://www.w3.org/2000/svg");
+            edgeNewEdgeContainer.setAttribute('version', '1.1');
+            edgeNewEdgeContainer.innerHTML = `
+            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5"
+                markerWidth="${this.markerSize}"
+                markerHeight="${this.markerSize}"                
+                fill="rgba(168, 168, 168, 0.8)"
+                orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" />
+            </marker>
+            `
+            edgeNewEdgeContainer.classList.add('edge-container');
+
+            if (elementNewEdgePath) {
+                edgeNewEdgeContainer.appendChild(elementNewEdgePath);
+                elementNewEdge = elementNewEdgePath;
+            }
+            if (elementNewEdgeLine) {
+                edgeNewEdgeContainer.appendChild(elementNewEdgeLine);
+                elementNewEdge = elementNewEdgeLine;
+            }
+
+            svgContainer.appendChild(edgeNewEdgeContainer);
+            svgContainer.style.display = 'none';
+            this.edgeElements.push({
+                element: elementNewEdge,
+                elementContainer: edgeNewEdgeContainer,
+                elementPath: elementNewEdgePath,
+                elementLine: elementNewEdgeLine
+            });
         }
     }
 
-    private calculateOffset(value: number): number {
+    calculateOffset(value: number): number {
         return (value * 100) / 200;
     }
 
@@ -141,46 +179,50 @@ export class EdgesComponent extends HTMLElement {
                 const startRect = active.startNode.outputsElement[active.outputTarget].getBoundingClientRect();
                 const endRect = active.endNode.inputsElement[active.inputTarget].getBoundingClientRect();
 
-                const startX = (startRect.left + (startRect.width) - this.getBoundingClientRect().left) / scale;
+                const startX = (startRect.left + (startRect.width / 2) - this.getBoundingClientRect().left) / scale;
                 const startY = (startRect.top + (startRect.height / 2) - this.getBoundingClientRect().top) / scale;
 
-                const endX = (endRect.left - this.getBoundingClientRect().left - (endRect.width)) / scale;
+                const endX = (endRect.left - this.getBoundingClientRect().left) / scale;
                 const endY = (endRect.top + (endRect.height / 2) - this.getBoundingClientRect().top) / scale;
 
                 const elementContainer = edgeElement.elementContainer;
 
                 // Calcule a largura e a altura do contêiner
-                const width = Math.abs(endX - startX);
+                let width = Math.abs(endX - startX);
                 let height = Math.abs(endY - startY);
 
                 // Ajuste a altura mínima do contêiner para a altura do marker
-                const minHeight = this.markerSize + 10;
+                const minHeight = this.markerSize + 40;
                 if (height < minHeight) {
                     height = minHeight;
                 }
 
-                // Calcule as margens de 5%
-                const marginX = width * 0.40;
-                const marginY = height * 0.40;
+                const minWidth = this.markerSize + 40;
+                if (width < minWidth) {
+                    width = minWidth;
+                }
 
-                
+
+                // Calcule as margens de 50% a mais do elementContainer
+                const marginX = width * 0.50;
+                const marginY = height * 0.50;
 
                 elementContainer.style.left = `${Math.min(startX, endX) - marginX}px`;
                 elementContainer.style.top = `${Math.min(startY, endY) - marginY}px`;
                 elementContainer.style.width = `${width + 2 * marginX}px`;
                 elementContainer.style.height = `${height + 2 * marginY}px`;
 
-                 // Ajuste as coordenadas dos elementos internos
+                // Ajuste as coordenadas dos elementos internos
                 const adjustedStartX = (startX - Math.min(startX, endX) + marginX);
                 const adjustedStartY = (startY - Math.min(startY, endY) + marginY);
                 const adjustedEndX = (endX - Math.min(startX, endX) + marginX - this.markerSize / scale);
                 const adjustedEndY = (endY - Math.min(startY, endY) + marginY);
-            
+
                 if (startY > endY - 50 && startY < endY + 50) {
                     edgeElement.elementLine.setAttribute("x1", adjustedStartX.toString());
-                edgeElement.elementLine.setAttribute("y1", adjustedStartY.toString());
-                edgeElement.elementLine.setAttribute("x2", adjustedEndX.toString());
-                edgeElement.elementLine.setAttribute("y2", adjustedEndY.toString());
+                    edgeElement.elementLine.setAttribute("y1", adjustedStartY.toString());
+                    edgeElement.elementLine.setAttribute("x2", adjustedEndX.toString());
+                    edgeElement.elementLine.setAttribute("y2", adjustedEndY.toString());
                     edgeElement.elementContainer.removeChild(edgeElement.element);
                     edgeElement.element = edgeElement.elementLine
                     edgeElement.elementContainer.appendChild(edgeElement.element);

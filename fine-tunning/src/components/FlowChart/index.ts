@@ -168,7 +168,13 @@ export class FlowChart extends HTMLElement {
         this.nodes.forEach(node => {node.setPosition(node.props.x,node.props.y);});
     }
 
-   
+    public addNode(nodeProps: NodeProps): void {
+        nodeProps.flowChart = this;
+        const node = new NodeComponent(nodeProps);
+        this.nodes.push(node);
+        this.board.appendChild(node);
+        this.edgesComponent?.updateEdgePositions();
+    }
 }
 
 customElements.define("flow-chart", FlowChart);

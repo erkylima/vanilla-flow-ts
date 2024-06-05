@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,        
+        "noEmit": true,
+        "isolatedModules": true,    
+        "plugins": [{ "name": "typescript-plugin-css-modules" }],
+    },
+    "include": ["src/**/*", "typings.d.ts"],
+    "exclude": ["node_modules", "dist", "examples", "rspack.config.js"]
+}
