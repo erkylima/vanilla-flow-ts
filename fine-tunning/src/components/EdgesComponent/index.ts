@@ -22,11 +22,10 @@ export class EdgesComponent extends HTMLElement {
     props: EdgeProps;
     private edgeElements: Array<EdgeExchange> = [];
     private markerSize = 6; // Tamanho do marker
-    private newEdge: EdgeExchange
-    private startNewEdgeContainerX: number
-    private startNewEdgeContainerY: number
+    private newEdge: EdgeExchange    
     private startNewEdgeX: number;
     private startNewEdgeY: number;
+    private nodesObserver: MutationObserver
     hasNewEdge: boolean = false;
     private currentOutputIndex: number = -1;
     private currentStartNode: NodeComponent | null = null;
@@ -270,6 +269,7 @@ export class EdgesComponent extends HTMLElement {
             observer.observe(active.startNode, { attributes: true });
             observer.observe(active.endNode, { attributes: true });
         });
+        this.nodesObserver = observer;
     }
 
     private onMouseMove(event: MouseEvent) {
@@ -334,7 +334,7 @@ export class EdgesComponent extends HTMLElement {
         if (this.hasNewEdge) {
             this.hasNewEdge = false;
             this.newEdge.elementContainer.style.display = 'none';
-            // this.currentStartNode = null;
+            this.currentStartNode = null;
             this.currentOutputIndex = -1;
             
         }
@@ -352,8 +352,6 @@ export class EdgesComponent extends HTMLElement {
         this.newEdge.elementContainer.style.left = startX + "px";
         this.newEdge.elementContainer.style.top = startX + "px";
 
-        this.startNewEdgeContainerX = startX;
-        this.startNewEdgeContainerY = startY;
         this.startNewEdgeX = startX;
         this.startNewEdgeY = startY;
 
@@ -419,7 +417,8 @@ export class EdgesComponent extends HTMLElement {
             // this.render();
             this.updateEdgePositions();
         }
-
+        this.nodesObserver.observe(this.currentStartNode, { attributes: true });
+        this.nodesObserver.observe(endNode, { attributes: true })
         this.hasNewEdge = false;
         this.newEdge.elementContainer.style.display = 'none';
         this.currentStartNode = null;
