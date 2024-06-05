@@ -54,10 +54,9 @@ export class NodeComponent extends HTMLElement {
             var element = document.createElement("div");                
             element.className = 'input';
             
-            element.addEventListener("mousedown", function(e) {
+            element.addEventListener("mouseup", (e) => {
                 e.stopPropagation();
-            });
-            element.addEventListener("mouseup", function(e) {
+                this.endNewEdge(e, i);
             });
             this.inputsElement.push(element);
             this.shadowRoot.querySelector(".inputs").appendChild(element);
@@ -69,10 +68,9 @@ export class NodeComponent extends HTMLElement {
             var element = document.createElement("div");                
             element.className = 'output';
             
-            element.addEventListener("mousedown", function(e) {
+            element.addEventListener("mousedown", (e) => {
                 e.stopPropagation();
-            });
-            element.addEventListener("mouseup", function(e) {
+                this.startNewEdge(e, i);
             });
             this.outputsElement.push(element);
             this.shadowRoot.querySelector(".outputs").appendChild(element);
@@ -207,6 +205,16 @@ export class NodeComponent extends HTMLElement {
         this.initialY = 0;
         window.removeEventListener('mousemove', this.onMouseMove.bind(this));
         window.removeEventListener('mouseup', this.onMouseUp.bind(this));
+    }
+
+    startNewEdge(event: MouseEvent, outputIndex: number) {
+
+        this.props.flowChart.edgesComponent.hasNewEdge = true;
+        this.props.flowChart.edgesComponent.startNewEdgeFromNode(this, outputIndex);
+    }
+
+    endNewEdge(event: MouseEvent, inputIndex: number) {
+        this.props.flowChart.edgesComponent.endNewEdgeAtNode(this, inputIndex);
     }
 }
 

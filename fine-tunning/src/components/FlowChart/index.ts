@@ -8,7 +8,7 @@ export interface FlowChartConfig {
 
 export class FlowChart extends HTMLElement {
     private nodes: NodeComponent[] = [];
-    private edgesComponent: EdgesComponent | null = null;
+    edgesComponent: EdgesComponent | null = null;
     board: HTMLElement;
     wrapper: HTMLElement;
     scale: number = 1;
@@ -171,10 +171,14 @@ export class FlowChart extends HTMLElement {
     public addNode(nodeProps: NodeProps): void {
         nodeProps.flowChart = this;
         const node = new NodeComponent(nodeProps);
+        node.props.id = this.nodes.length + 1;
+        node.props.flowChart = this;
         this.nodes.push(node);
         this.board.appendChild(node);
         this.edgesComponent?.updateEdgePositions();
     }
+
+    
 }
 
 customElements.define("flow-chart", FlowChart);
