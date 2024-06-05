@@ -1,249 +1,221 @@
-import styles from "./styles.module.css";
+import { addClickOutsideListener } from "../../util/builder";
+import { FlowChart } from "../FlowChart";
 
-interface Position {
-    x: number;
-    y: number;
+export interface NodeProps {
+    id?: number;
+    x?: number;
+    y?: number;
+    inputs?: number;
+    outputs?: number;
+    flowChart?: FlowChart;
 }
 
-export interface NodeComponentProps {
-    ref?: any;
-    id?: string;
-    x: number;
-    y: number;
-    selected: boolean;
-    actions?: { delete?: boolean };
-    label?: string;
-    content: string | HTMLElement;
-    inputs: number;
-    outputs: number;  
-    onNodeMount?: (inputs: { offset: { x: number; y: number } }[], outputs: { offset: { x: number; y: number } }[]) => void;  
-    onMouseDown?: (event: any) => Position;
-    onMouseUp?: (event: any) => void;
-    onMouseDownOutput?: (outputIndex: number) => void;
-    onMouseUpInput?: (inputIndex: number) => void;
-    onClickOutside?: () => void;
-    onClickDelete?: () => void;
-}
+export class NodeComponent extends HTMLElement {
+    props: NodeProps = {
+        inputs: 0,
+        outputs: 0,
+        x: 20,
+        y: 20,
+    };
+    private offsetX: number = 0;
+    private offsetY: number = 0;
+    private initialX: number = 0;
+    private initialY: number = 0;
+    private initialNodeX: number = 0;
+    private initialNodeY: number = 0;
+    inputsElement: Array<HTMLElement> = new Array<HTMLElement>();
+    outputsElement: Array<HTMLElement> = new Array<HTMLElement>();
+    private isDragging: boolean = false;
 
-
-export default class NodeComponent extends HTMLElement {
-    
-    props: NodeComponentProps = null
-
-    private inputRefs: HTMLElement[]
-    private outputRefs: HTMLElement[]
-    private inputs: { offset: { x: number; y: number } }[] = []
-    private outputs: { offset: { x: number; y: number } }[] = []
-    static observedAttributes = ["style"];
-
-    constructor(props: NodeComponentProps) {
+    constructor(props: NodeProps) {
         super();
-        if (props){
-            this.inputRefs = this.populateInputPoints(props.inputs, props);
-        
-            this.outputRefs = this.populateOutputPoints(props.outputs, props);
-
-            
-            this.props = props;       
-                 
-            this.render()
-        }
+        this.id = props.id +"";
+        this.attachShadow({ mode: 'open' });
+        this.props = props;
+        this.setPosition(props.x, props.y);
+        this.render();
+        this.populateInputPoints(this.props.inputs);
+        this.populateOutputPoints(this.props.outputs);
     }
+
+    private isActive: boolean = false;
 
     connectedCallback() {
-        
-        for (let i = 0; i < this.inputRefs.length; i++) {              
-            this.inputs.push({ offset: { x: this.querySelector(`#input-${(i+1)}-${this.props.id}`).getBoundingClientRect().x, y: this.querySelector(`#input-${(i+1)}-${this.props.id}`).getBoundingClientRect().y } });
-        }
-        
-        for (let i = 0; i < this.outputRefs.length; i++) {
-            this.outputs.push({ offset: { x: this.querySelector(`#output-${(i+1)}-${this.props.id}`).getBoundingClientRect().x, y: this.querySelector(`#output-${(i+1)}-${this.props.id}`).getBoundingClientRect().y } });
-        }
+        addClickOutsideListener(this.shadowRoot, () => {
+            this.className = '';
+            this.isActive = false;
+        });
+        this.addEventListener('dblclick', () => { this.className = this.isActive ? '' : 'active'; this.isActive = !this.isActive; });
+        this.addEventListener('mousedown', this.onMouseDown.bind(this));
+    }
 
-        this.props.onNodeMount(this.inputs, this.outputs);
-        // for (let i = 0; i < this.inputRefs.length; i++) {  
-        //     alert(JSON.stringify())                
-        // }
-        // for (let i = 0; i < this.outputRefs.length; i++) {  
-
-        //     alert(JSON.stringify())                
-        // }
+    populateInputPoints(length: number) {                
+        for (let i = 0; i < length; i++) {
+            var element = document.createElement("div");                
+            element.className = 'input';
             
-        
-    }
-    attributeChangedCallback(name: any, oldValue: any, newValue: any) {
-        console.log(
-          `Attribute ${name} has changed from ${oldValue} to ${newValue}.`,
-        );        
-    }
-    
-    render() {        
-        
-        this.nodeElement()
-        this.append(this.deleteElement())
-        if (this.props.label) this.append(this.labelElement())
-        this.append(this.contentElement())
-        this.append(this.inputsElement())
-        this.append(this.outputsElement())
-
-    }
-
-    
-
-    populateInputPoints(lenght:number, props): HTMLElement[] {
-        if (props){
-            var elements: HTMLElement[] = [];
-            for (let i = 0; i < lenght; i++) {
-                var element = document.createElement("div");
-                element.id = "input-" + (i+1) + "-" + props.id
-                element.className = styles.nodeInput
-                
-                element.addEventListener("mousedown", function(e) {
-                    e.stopPropagation();
-                })
-                element.addEventListener("mouseup", function(e) {
-                })
-                
-                elements.push(element)
-            }
-            return elements
+            element.addEventListener("mouseup", (e) => {
+                e.stopPropagation();
+                this.endNewEdge(e, i);
+            });
+            this.inputsElement.push(element);
+            this.shadowRoot.querySelector(".inputs").appendChild(element);
         }
     }
-    populateOutputPoints(lenght:number, props:NodeComponentProps): HTMLElement[] {
-        var elements: HTMLElement[] = [];
-        if (props){
-            for (let i = 0; i < lenght; i++) {
-                var element = document.createElement("div");
-                element.className = styles.nodeOutput
-                element.id = "output-" + (i+1) + "-" + props.id
-                element.addEventListener("mousedown", function(e) {
-                    if (props.onMouseDownOutput) props.onMouseDownOutput(i);
-                })
 
-                elements.push(element)
-            }
+    populateOutputPoints(length: number) {
+        for (let i = 0; i < length; i++) {
+            var element = document.createElement("div");                
+            element.className = 'output';
             
-            return elements
+            element.addEventListener("mousedown", (e) => {
+                e.stopPropagation();
+                this.startNewEdge(e, i);
+            });
+            this.outputsElement.push(element);
+            this.shadowRoot.querySelector(".outputs").appendChild(element);
         }
     }
 
-    clickOutside(el, accessor) {
-        const onClick = (e) => {
-            if (!el.contains(e.target)) {
-                accessor()?.();
-            }
-        };
-        document.body.addEventListener("click", onClick);
-        document.body.removeEventListener("click", onClick);
+    setPosition(x: number, y: number) {
+        this.style.left = x + 'px';
+        this.style.top = y + 'px';
     }
 
-    inputsElement(){
-        var inputs = document.createElement("div")
-        inputs.className = styles.nodeInputs
-        if (this.props.inputs > 0 ) {
-            this.inputRefs.forEach(element => {
-                inputs.append(element)
-                
-            })
+    private render() {
+        this.shadowRoot.innerHTML = `
+            <style>
+                :host {
+                    display: flex;
+                    flex-direction: column;
+                    position: absolute;
+                    cursor: grab;
+                    background-color: white;
+                    border: 1px solid #e6d4be;
+                    border-radius: 6px;
+                    box-shadow: 1px 1px 11px -6px rgba(0, 0, 0, 0.75);
+                    user-select: none;
+                    z-index: 1;
+                    padding: 10px;
+                    width:50px;
+                    height: 50px;
+                    transition: border ease 0.2s, box-shadow ease 0.2s;
+                    align-content: center;
+                    align-items: center;
+                }
+                :host(:hover){
+                    box-shadow: 2px 2px 12px -6px rgba(0, 0, 0, 0.75);
+                }
+                :host(.active) {
+                    display: flex;
+                    flex-direction: column;
+                    position: absolute;
+                    cursor: grab;
+                    background-color: white;
+                    border: 1px solid #e38c29;
+                    border-radius: 6px;
+                    box-shadow: 1px 1px 11px -6px rgba(0, 0, 0, 0.75);
+                    user-select: none;
+                    z-index: 100;
+                    transition: border ease 0.2s, box-shadow ease 0.2s;
+                }
+                .inputs {
+                    pointer-events: none;
+                    cursor: initial;
+                    position: absolute;                    
+                    left: calc(12px * -0.1);
+                    display: flex;
+                    flex-direction: column;
+                    top: 50%;
+                    transform: translate(-50%,-50%);
+                    }
+                .input {
+                    pointer-events: all;
+                    cursor: initial;
+                    background-color: #9c9c9c;
+                    width: 6px;
+                    height: 12px;
+                    margin: 6px 0px;
+                    box-shadow: 1px 1px 11px -6px rgba(0, 0, 0, 0.75);
+                }
+                .outputs {
+                    pointer-events: none;
+                    z-index: -3;
+                    position: absolute;                    
+                    right: calc(12px * -1.5);
+                    display: flex;
+                    flex-direction: column;
+                    top: 50%;
+                    transform: translate(-50%,-50%)
+                }
+                .output {
+                    pointer-events: all;
+                    cursor: crosshair;
+                    background-color: #e38b29;
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 100%;
+                    margin: 5px 0px;
+                    box-shadow: 1px 1px 11px -6px rgba(0, 0, 0, 0.75);
+                }
+            </style>
+            <div class="inputs"></div>
+            <div class="outputs"></div>
+            <p>Text</p>
+        `;
+    }
+
+    private onMouseDown(event: MouseEvent) {
+        event.preventDefault();
+        this.isDragging = true;
+        const rect = this.getBoundingClientRect();
+        this.offsetX = (event.clientX - rect.left) ;
+        this.offsetY = (event.clientY - rect.top) ;    
+        this.initialX = event.clientX;
+        this.initialY = event.clientY;
+        this.initialNodeX = this.props.x
+        this.initialNodeY = this.props.y
+
+        window.addEventListener('mousemove', this.onMouseMove.bind(this));
+        window.addEventListener('mouseup', this.onMouseUp.bind(this));
+
+        // Notificar o FlowChart de que um nó está sendo arrastado
+        if (this.props.flowChart) {
+            this.props.flowChart.notifyNodeDragging(true);
         }
-        
-        return inputs
     }
 
-    outputsElement(){
-        var outputs = document.createElement("div")
-        outputs.className = styles.nodeOutputs
-        if (this.props.outputs > 0 ) {
-            this.outputRefs.forEach(element => {
-                outputs.append(element)
-            });            
-        }
-        return outputs
+    private onMouseMove(event: MouseEvent) {
+        if (!this.isDragging) return;
+        const dx = (event.clientX - this.initialX)/this.props.flowChart.scale 
+        const dy = (event.clientY - this.initialY)/this.props.flowChart.scale        
+        this.props.x = this.initialNodeX + dx;
+        this.props.y = this.initialNodeY + dy;
+        this.setPosition(this.props.x, this.props.y);
     }
 
-    contentElement(){ 
-        const content  = document.createElement("div")
-        content.className = styles.nodeContent
-
-        if (this.props.content instanceof HTMLElement){
-            content.appendChild(this.props.content)
-        } else {
-            content.innerText = this.props.content + ""
-        }
-        content.addEventListener("mousedown", ((ev) => {
-            setTimeout(function() {
-                // You are now in a hold state, you can do whatever you like!
-              }, 500);
-            const position = this.props.onMouseDown(ev)
-            
-        }));
-        content.addEventListener("mouseup", ((ev) => {
-
-            this.props.onMouseUp(ev)
-
-        }));
-        return content  
+    private onMouseUp(event: MouseEvent) {
+        if (!this.isDragging) return;
+        this.isDragging = false;
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.initialNodeX = 0;
+        this.initialNodeY = 0;
+        this.initialX = 0;
+        this.initialY = 0;
+        window.removeEventListener('mousemove', this.onMouseMove.bind(this));
+        window.removeEventListener('mouseup', this.onMouseUp.bind(this));
     }
 
-    labelElement() {
-        var label = document.createElement("span")
-        label.className = styles.nodeLabel
-        label.innerText = this.props.label? this.props.label : ""
-        
-        return label
+    startNewEdge(event: MouseEvent, outputIndex: number) {
+
+        this.props.flowChart.edgesComponent.hasNewEdge = true;
+        this.props.flowChart.edgesComponent.startNewEdgeFromNode(this, outputIndex);
     }
 
-    nodeElement() {
-        this.id = this.props.id
-        this.className = this.props.selected ? styles.nodeSelected : styles.node
-        this.style.transform = `translate(${this.props.x}px, ${this.props.y}px)`
-        this.addEventListener("dblclick", ((ev) => {
-            ev.stopImmediatePropagation()
-            this.props.selected = !this.props.selected
-            document.getElementById("action-"+this.props.id).className = this.props.selected ? styles.actions : styles.actionsHidden
-            this.className = this.props.selected ? styles.nodeSelected : styles.node
-            
-        }));        
+    endNewEdge(event: MouseEvent, inputIndex: number) {
+        this.props.flowChart.edgesComponent.endNewEdgeAtNode(this, inputIndex);
     }
+}
 
-    deleteElement() {
-
-
-        var actions = document.createElement("div")
-        actions.className = this.props.selected ? styles.actions : styles.actionsHidden
-        actions.id = "action-"+this.props.id
-
-
-        var svg = document.createElementNS("http://www.w3.org/2000/svg","svg")
-        svg.addEventListener("click", (ev) => {
-            setTimeout(function() {
-                // You are now in a hold state, you can do whatever you like!
-              }, 500);
-            this.props.onClickDelete()            
-        })
-        svg.setAttribute("class", styles.delete)
-        svg.setAttribute("fill", "currentColor")
-        svg.setAttribute("stroke-width", "0")
-        svg.setAttribute("baseProfile", "tiny")
-        svg.setAttribute("version", "1.2")
-        svg.setAttribute("viewBox", "4 4 16 16")
-        svg.style.overflow = 'visible';
-        var path = document.createElementNS(svg.namespaceURI,"path");  
-
-
-        path.setAttributeNS(null, "d", "M12 4c-4.419 0-8 3.582-8 8s3.581 8 8 8 8-3.582 8-8-3.581-8-8-8zm3.707 10.293a.999.999 0 11-1.414 1.414L12 13.414l-2.293 2.293a.997.997 0 01-1.414 0 .999.999 0 010-1.414L10.586 12 8.293 9.707a.999.999 0 111.414-1.414L12 10.586l2.293-2.293a.999.999 0 111.414 1.414L13.414 12l2.293 2.293z")
-        svg.append(path)
-        
-
-        actions.appendChild(svg)
-
-        
-        return actions
-    }
-  
-
-    
-};
-
-customElements.define('node-component', NodeComponent);
-
+customElements.define("node-component", NodeComponent);

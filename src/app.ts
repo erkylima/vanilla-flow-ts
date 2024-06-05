@@ -1,130 +1,55 @@
-import FlowChart, { BoardEdgeProps, BoardNodeProps } from "./components/Board";
-import { ElementBuilder } from "./util/builder";
-const pnode1 = ElementBuilder("p", "This is a simple node");
-
-const pnode2 = document.createElement("p");
-pnode2.textContent = "This is a node with a label"
-const pnode4 = document.createElement("p");
-pnode4.textContent = "This is a node with only inputs"
-const p = document.createElement("p");
-p.textContent = "This is a node with two inputs and two outputs"
+import { FlowChart, FlowChartConfig } from "./components/FlowChart";
 
 
-const initialNodes = [
-    {
-        id: "node-1",
-        position: { x: 50, y: 100 },
-        data: {
-            content: pnode1,
-        },
-        inputs: 0,
-        outputs: 1,
-    },
-    {
-        id: "node-2",
-        position: { x: 350, y: 100 },
-        data: {
-            label: "Node with label",
-            content: pnode2,
-        },
-        inputs: 1,
-        outputs: 1,
-    },
-    {
-        id: "node-3",
-        position: { x: 350, y: 300 },
-        data: {
-            content: p,
-        },
-        inputs: 2,
-        outputs: 2,
-    },
+export class App extends HTMLElement {
 
-    {
-        id: "node-4",
-        position: { x: 900, y: 100 },
-        data: {
-            label: "Only inputs",
-            content: pnode4,
-        },
-        inputs: 2,
-        outputs: 0,
-    },
-];
-
-const initialEdges = [
-    {
-        id: "edge_0:0_1:0",
-        sourceNode: "node-1",
-        sourceOutput: 0,
-        targetNode: "node-2",
-        targetInput: 0,
-    },
-    {
-        id: "edge_0:0_2:0",
-        sourceNode: "node-1",
-        sourceOutput: 0,
-        targetNode: "node-3",
-        targetInput: 0,
-    },
-    {
-        id: "edge_1:0_3:0",
-        sourceNode: "node-2",
-        sourceOutput: 0,
-        targetNode: "node-4",
-        targetInput: 0,
-    },
-    {
-        id: "edge_2:0_3:1",
-        sourceNode: "node-3",
-        sourceOutput: 0,
-        targetNode: "node-4",
-        targetInput: 1,
-    },
-];
-
-export default class AppRoot extends HTMLElement {
-    nodes:BoardNodeProps[];
-    set setNodes(nodes:BoardNodeProps[]){
-        this.nodes = nodes;
-    }
-    edges:BoardEdgeProps[];
-    set setEdges(edges:BoardEdgeProps[]){
-        this.edges = edges;
-    }
     constructor(){
-        super();   
-        this.setNodes = initialNodes;
-        this.setEdges = initialEdges;
-        this.render();
+        super();
     }
 
+    connectedCallback(){
+        this.attachShadow({mode: 'open'});
+        const nodesConfig = [
+            { id: 1, x: 200+100, y: 160, inputs: 0, outputs: 2 },
+            { id: 2, x: 200+300, y: 260, inputs: 1, outputs: 1 },
+            { id: 3, x: 200+300, y: 60, inputs: 1, outputs: 1 },
+            { id: 4, x: 200+600, y: 160, inputs: 2, outputs: 2 },
+            { id: 5, x: 200+900, y: 160, inputs: 1, },
+            { id: 6, x: 200+900+200, y: 260, inputs: 1 },
+        ];
+        
+        const edgesConfig = [
+            { startNodeIndex: 1, endNodeIndex: 3, outputTarget: 1, inputTarget: 1 },
+            { startNodeIndex: 1, endNodeIndex: 2, outputTarget: 2, inputTarget: 1 },
+            { startNodeIndex:  3, endNodeIndex: 4, outputTarget: 1, inputTarget: 1 },
+            { startNodeIndex:  2, endNodeIndex: 4, outputTarget: 1, inputTarget: 2 },
+            { startNodeIndex:  4, endNodeIndex: 5, outputTarget: 1, inputTarget: 1 },
+            { startNodeIndex:  4, endNodeIndex: 6, outputTarget: 2, inputTarget: 1 },
+        ];
+        
+        // Criando o objeto de configuração para o FlowChart
+        const flowChartConfig: FlowChartConfig = {
+            nodes: nodesConfig,
+            edges: edgesConfig,
+        };
+        
+        // Instanciando o FlowChart com os objetos de configuração
+        const flowChart = new FlowChart(flowChartConfig);
+        this.shadowRoot.appendChild(flowChart);
+        let doc = document.createElement('button')
+        doc.innerText = 'Add Node';
+        doc.addEventListener('click', () => {
+            flowChart.addNode({
+                x: Math.round(Math.random() * 1000),
+                y: Math.round(Math.random() * 300),
+                inputs: 1,
+                outputs: 1,
+            });
+        });
+        this.shadowRoot.appendChild(doc)
+        
 
-    render() {
-        const flowchart = new FlowChart({
-            nodes: this.nodes,
-            edges: this.edges,
-            onNodesChange: (newNodes: BoardNodeProps[]) => {
-                this.setNodes =newNodes;
-            },
-            onEdgesChange: (newEdges: BoardEdgeProps[]) => {
-                this.setEdges = newEdges;
-            }
-        })
-        // var node = new NodeComponent({
-        //     "id":"node-1",
-        //     "x":50,
-        //     "y":100,
-        //     "selected":false,
-        //     "label":"Node",
-        //     "content":"This is a simple node",
-        //     "inputs":0,
-        //     "outputs":1
-
-        // });
-        this.append(flowchart);
     }
-    
 }
 
-customElements.define("app-root", AppRoot);
+customElements.define('root-app', App);

@@ -1,8 +1,5 @@
+import { App } from "./app"
 
-import AppRoot from "./app";
-
-window.onload = function() {
-    var app = new AppRoot();
-    
-    document.getElementById("root")?.appendChild(app);
+window.onload= () =>{
+    document.querySelector("#root").append(new App())
 }
