@@ -22,7 +22,7 @@ export class EdgesComponent extends HTMLElement {
     props: EdgeProps;
     private edgeElements: Array<EdgeExchange> = [];
     private markerSize = 6; // Tamanho do marker
-
+    hasNewEdge: boolean = false;
     constructor(props: EdgeProps) {
         super();
         this.props = props;
@@ -121,45 +121,7 @@ export class EdgesComponent extends HTMLElement {
                         });
                     }
                 });
-            });
-            
-            // Add New Edge Element
-            const elementNewEdgePath = this.createEdgeElementPath();
-            const elementNewEdgeLine = this.createEdgeElementLine();
-            let elementNewEdge: SVGLineElement | SVGPathElement;
-
-            const edgeNewEdgeContainer = document.createElementNS
-            ('http://www.w3.org/2000/svg', 'svg');;
-            edgeNewEdgeContainer.setAttribute('xmlns', "http://www.w3.org/2000/svg");
-            edgeNewEdgeContainer.setAttribute('version', '1.1');
-            edgeNewEdgeContainer.innerHTML = `
-            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5"
-                markerWidth="${this.markerSize}"
-                markerHeight="${this.markerSize}"                
-                fill="rgba(168, 168, 168, 0.8)"
-                orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 z" />
-            </marker>
-            `
-            edgeNewEdgeContainer.classList.add('edge-container');
-
-            if (elementNewEdgePath) {
-                edgeNewEdgeContainer.appendChild(elementNewEdgePath);
-                elementNewEdge = elementNewEdgePath;
-            }
-            if (elementNewEdgeLine) {
-                edgeNewEdgeContainer.appendChild(elementNewEdgeLine);
-                elementNewEdge = elementNewEdgeLine;
-            }
-
-            svgContainer.appendChild(edgeNewEdgeContainer);
-            svgContainer.style.display = 'none';
-            this.edgeElements.push({
-                element: elementNewEdge,
-                elementContainer: edgeNewEdgeContainer,
-                elementPath: elementNewEdgePath,
-                elementLine: elementNewEdgeLine
-            });
+            });                        
         }
     }
 
@@ -173,6 +135,11 @@ export class EdgesComponent extends HTMLElement {
         const translateY = this.props.flowchart.translateY;
 
         this.edgeElements.forEach((edgeElement, index) => {
+            
+            // if (index === this.edgeElements.length-1) {
+            //     // alert("s")
+            //     return;
+            // }
             const activeIndex = index;
             const active = this.props.actives[activeIndex];
             if (active.outputTarget < active.startNode.outputsElement.length && active.inputTarget < active.endNode.inputsElement.length) {
