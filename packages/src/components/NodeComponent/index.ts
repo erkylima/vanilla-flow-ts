@@ -7,7 +7,7 @@ export interface NodeProps {
     y: number;
     inputs: number;
     outputs: number;
-    flowChart: FlowChart;
+    flowChart?: FlowChart;
 }
 
 export class NodeComponent extends HTMLElement {
@@ -205,12 +205,12 @@ export class NodeComponent extends HTMLElement {
     }
 
     startNewEdge(event: MouseEvent, outputIndex: number) {
-        this.props.flowChart.edgesComponent.hasNewEdge = true;
-        this.props.flowChart.edgesComponent.startNewEdgeFromNode(this, outputIndex);
+        this.props.flowChart!.edgesComponent.hasNewEdge = true;
+        this.props.flowChart!.edgesComponent.startNewEdgeFromNode(this, outputIndex);
     }
 
     endNewEdge(event: MouseEvent, inputIndex: number) {
-        this.props.flowChart.edgesComponent.endNewEdgeAtNode(this, inputIndex);
+        this.props.flowChart!.edgesComponent.endNewEdgeAtNode(this, inputIndex);
     }
 }
 
