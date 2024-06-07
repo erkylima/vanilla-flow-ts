@@ -1,5 +1,5 @@
 import { FlowChart } from "../FlowChart";
-import { NodeComponent, NodeProps } from "../NodeComponent";
+import { NodeComponent } from "../NodeComponent";
 
 export interface EdgeProps {
     actives: Array<{
@@ -264,7 +264,7 @@ export class EdgesComponent extends HTMLElement {
         const observer = new MutationObserver(() => {
             this.updateEdgePositions();
         });
-
+        
         this.props.actives.forEach(active => {
             observer.observe(active.startNode, { attributes: true });
             observer.observe(active.endNode, { attributes: true });
@@ -370,8 +370,9 @@ export class EdgesComponent extends HTMLElement {
     }
 
     public endNewEdgeAtNode(endNode: NodeComponent, inputIndex: number) {
-        if (this.currentStartNode) {
-            
+        const existsEdge = this.props.actives.some(active => active.endNode === endNode && active.inputTarget === inputIndex && active.outputTarget === this.currentOutputIndex && active.startNode === this.currentStartNode)
+        
+        if (this.currentStartNode != endNode && !existsEdge) {
             const newEdge = {
                 startNode: this.currentStartNode,
                 endNode,
@@ -414,11 +415,11 @@ export class EdgesComponent extends HTMLElement {
                 elementLine: elementLine
             });
             this.props.actives.push(newEdge);
-            // this.render();
+            
             this.updateEdgePositions();
-        }
-        this.nodesObserver.observe(this.currentStartNode, { attributes: true });
-        this.nodesObserver.observe(endNode, { attributes: true })
+            this.nodesObserver.observe(this.currentStartNode, { attributes: true });
+            this.nodesObserver.observe(endNode, { attributes: true })
+        }        
         this.hasNewEdge = false;
         this.newEdge.elementContainer.style.display = 'none';
         this.currentStartNode = null;
