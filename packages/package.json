@@ -1,7 +1,7 @@
 {
   "name": "vanilla-flow",
   "private": false,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
