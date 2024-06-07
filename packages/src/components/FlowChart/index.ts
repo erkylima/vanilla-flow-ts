@@ -4,6 +4,9 @@ import { EdgesComponent, EdgeProps } from "../EdgesComponent/index";
 export interface FlowChartConfig {
     nodes: NodeProps[];
     edges: { startNodeIndex: number; endNodeIndex: number; inputTarget: number; outputTarget: number; }[];
+    edgeCss?: CSSStyleSheet;
+    nodeCss?: CSSStyleSheet;
+    flowCss?: CSSStyleSheet;
 }
 
 export class FlowChart extends HTMLElement {
