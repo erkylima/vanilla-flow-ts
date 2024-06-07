@@ -55,8 +55,9 @@ export class NodeComponent extends HTMLElement {
             element.className = 'input';
             
             element.addEventListener("mouseup", (e) => {
-                e.stopPropagation();
-                this.endNewEdge(e, i);
+                e.preventDefault();
+                if(this.props.flowChart.edgesComponent.hasNewEdge)
+                    this.endNewEdge(e, i);
             });
             this.inputsElement.push(element);
             this.shadowRoot.querySelector(".inputs").appendChild(element);

@@ -264,7 +264,7 @@ export class EdgesComponent extends HTMLElement {
         const observer = new MutationObserver(() => {
             this.updateEdgePositions();
         });
-
+        
         this.props.actives.forEach(active => {
             observer.observe(active.startNode, { attributes: true });
             observer.observe(active.endNode, { attributes: true });
