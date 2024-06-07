@@ -20,7 +20,9 @@
     "tslib": "^2.6.3",
     "typescript-plugin-css-modules": "^5.1.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "vanilla-flow": "^1.0.2"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/erkylima/vanilla-flow-ts.git"

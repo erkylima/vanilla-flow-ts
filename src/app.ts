@@ -1,6 +1,4 @@
-import { FlowChart, FlowChartConfig } from "./components/FlowChart";
-
-
+import { FlowChart, FlowChartConfig } from 'vanilla-flow/dist/index';
 export class App extends HTMLElement {
 
     constructor(){
@@ -14,8 +12,8 @@ export class App extends HTMLElement {
             { id: 2, x: 200+300, y: 260, inputs: 1, outputs: 1 },
             { id: 3, x: 200+300, y: 60, inputs: 1, outputs: 1 },
             { id: 4, x: 200+600, y: 160, inputs: 2, outputs: 2 },
-            { id: 5, x: 200+900, y: 160, inputs: 1, },
-            { id: 6, x: 200+900+200, y: 260, inputs: 1 },
+            { id: 5, x: 200+900, y: 160, inputs: 1, outputs: 0},
+            { id: 6, x: 200+900+200, y: 260, inputs: 1, outputs: 0 },
         ];
         
         const edgesConfig = [
@@ -38,14 +36,7 @@ export class App extends HTMLElement {
         this.shadowRoot.appendChild(flowChart);
         let doc = document.createElement('button')
         doc.innerText = 'Add Node';
-        doc.addEventListener('click', () => {
-            flowChart.addNode({
-                x: Math.round(Math.random() * 1000),
-                y: Math.round(Math.random() * 300),
-                inputs: 1,
-                outputs: 1,
-            });
-        });
+        
         this.shadowRoot.appendChild(doc)
         
 
