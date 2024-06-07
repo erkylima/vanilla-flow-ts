@@ -3,12 +3,14 @@
         "target": "ESNext",
         "module": "ESNext",
         "moduleResolution": "Bundler",
+        "outDir": "./dist",
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,        
         "noEmit": true,
+        "declaration": true,        
         "isolatedModules": true,    
         "plugins": [{ "name": "typescript-plugin-css-modules" }],
     },
     "include": ["src/**/*", "typings.d.ts"],
-    "exclude": ["node_modules", "dist", "examples", "rspack.config.js"]
+    "exclude": ["node_modules", "examples", "rspack.config.js"]
 }

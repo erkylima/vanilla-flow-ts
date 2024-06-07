@@ -1,6 +1,6 @@
 {
-  "name": "rspack-react-starter",
-  "private": true,
+  "name": "vanilla-flow",
+  "private": false,
   "version": "1.0.0",
   "scripts": {
     "build": "tsc",
