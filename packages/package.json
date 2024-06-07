@@ -1,0 +1,17 @@
+{
+  "name": "rspack-react-starter",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "yarn run clean && yarn run build"
+  },
+  "devDependencies": {
+    "ts-jest": "^29.1.4",
+    "typescript-plugin-css-modules": "^5.1.0"
+  },
+  "dependencies": {
+    "postcss": "^8.4.38"
+  }
+}
