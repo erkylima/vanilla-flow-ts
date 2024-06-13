@@ -61,6 +61,10 @@ Contribuindo
 
 Contribuições são bem-vindas! Sinta-se à vontade para abrir problemas (issues) ou enviar pull requests com melhorias.
 
+Para publicar é necessário digitar os comandos
+
+`yarn build`
+
 Licença
 -------
 
