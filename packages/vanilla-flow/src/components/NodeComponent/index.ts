@@ -18,8 +18,8 @@ export class NodeComponent extends HTMLElement {
     private initialY: number = 0;
     private initialNodeX: number = 0;
     private initialNodeY: number = 0;
-    inputsElement: Array<HTMLElement> = new Array<HTMLElement>();
-    outputsElement: Array<HTMLElement> = new Array<HTMLElement>();
+    private inputsElement: Array<HTMLElement> = new Array<HTMLElement>();
+    private outputsElement: Array<HTMLElement> = new Array<HTMLElement>();
     private isDragging: boolean = false;
     private shadow: ShadowRoot
     constructor(props: NodeProps) {
@@ -46,7 +46,7 @@ export class NodeComponent extends HTMLElement {
 
     populateInputPoints(length: number) {                
         for (let i = 0; i < length; i++) {
-            var element = document.createElement("div");                
+            const element = document.createElement("div");                
             element.className = 'input';
             
             element.addEventListener("mouseup", (e) => {
@@ -61,7 +61,7 @@ export class NodeComponent extends HTMLElement {
 
     populateOutputPoints(length: number) {
         for (let i = 0; i < length; i++) {
-            var element = document.createElement("div");                
+            const element = document.createElement("div");                
             element.className = 'output';
             
             element.addEventListener("mousedown", (e) => {
