@@ -28,10 +28,7 @@ export class App extends HTMLElement {
         // Criando o objeto de configuração para o FlowChart
         const flowChartConfig: FlowChartConfig = {
             nodes: nodesConfig,
-            edges: edgesConfig,
-            initialScale: 1.5,
-            minScale: 0.5,
-            maxScale: 2,
+            edges: edgesConfig
         };
         
         // Instanciando o FlowChart com os objetos de configuração
