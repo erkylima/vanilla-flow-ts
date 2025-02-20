@@ -18,8 +18,8 @@ export class NodeComponent extends HTMLElement {
     private initialY: number = 0;
     private initialNodeX: number = 0;
     private initialNodeY: number = 0;
-    private inputsElement: Array<HTMLElement> = new Array<HTMLElement>();
-    private outputsElement: Array<HTMLElement> = new Array<HTMLElement>();
+    public inputsElement: Array<HTMLElement> = new Array<HTMLElement>();
+    public outputsElement: Array<HTMLElement> = new Array<HTMLElement>();
     private isDragging: boolean = false;
     private shadow: ShadowRoot
     constructor(props: NodeProps) {

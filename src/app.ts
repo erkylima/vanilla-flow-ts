@@ -1,4 +1,4 @@
-import { FlowChart, FlowChartConfig } from 'vanilla-flow/dist/index';
+import { FlowChart, FlowChartConfig } from '../packages/vanilla-flow/src/index';
 export class App extends HTMLElement {
 
     constructor(){
@@ -29,6 +29,9 @@ export class App extends HTMLElement {
         const flowChartConfig: FlowChartConfig = {
             nodes: nodesConfig,
             edges: edgesConfig,
+            initialScale: 1.5,
+            minScale: 0.5,
+            maxScale: 2,
         };
         
         // Instanciando o FlowChart com os objetos de configuração

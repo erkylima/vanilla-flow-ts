@@ -22,7 +22,7 @@ coverage
 
 # API keys and secrets
 .env
-
+.story_coder
 # Dependency directory
 node_modules
 bower_components

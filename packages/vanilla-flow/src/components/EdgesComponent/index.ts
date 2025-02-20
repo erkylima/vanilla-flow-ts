@@ -21,7 +21,7 @@ interface EdgeExchange {
 export class EdgesComponent extends HTMLElement {
     props: EdgeProps;
     private edgeElements: Array<EdgeExchange> = [];
-    private markerSize = 6; // Tamanho do marker
+    private markerSize = 8; // Tamanho do marker
     private newEdge!: EdgeExchange;    
     private startNewEdgeX!: number;
     private startNewEdgeY!: number;
@@ -54,7 +54,7 @@ export class EdgesComponent extends HTMLElement {
         let elementNewEdge!: SVGLineElement | SVGPathElement;
 
         const edgeNewEdgeContainer = document.createElementNS
-        ('http://www.w3.org/2000/svg', 'svg');;
+        ('http://www.w3.org/2000/svg', 'svg');
         edgeNewEdgeContainer.setAttribute('xmlns', "http://www.w3.org/2000/svg");
         edgeNewEdgeContainer.setAttribute('version', '1.1');
         edgeNewEdgeContainer.innerHTML = `
@@ -65,7 +65,7 @@ export class EdgesComponent extends HTMLElement {
             orient="auto-start-reverse">
             <path d="M 0 0 L 10 5 L 0 10 z" />
         </marker>
-        `
+        `;
         edgeNewEdgeContainer.setAttribute('class', 'edge-container new-edge');
 
         if (elementNewEdgePath) {
@@ -187,11 +187,7 @@ export class EdgesComponent extends HTMLElement {
         const translateY = this.props.flowchart.translateY;
 
         this.edgeElements.forEach((edgeElement, index) => {
-            
-            // if (index === this.edgeElements.length-1) {
-            //     // alert("s")
-            //     return;
-            // }
+        
             const activeIndex = index;
             const active = this.props.actives[activeIndex];
             if (active.outputTarget < active.startNode.outputsElement.length && active.inputTarget < active.endNode.inputsElement.length) {
@@ -273,47 +269,49 @@ export class EdgesComponent extends HTMLElement {
     }
 
     private onMouseMove(event: MouseEvent) {
-        event.stopPropagation;
+        event.stopPropagation();
         if (!this.hasNewEdge) return;
+    
         const { clientX, clientY } = event;
         const scale = this.props.flowchart.scale;
-        const translateX = this.props.flowchart.translateX;
-        const translateY = this.props.flowchart.translateY;        
-
-        // Calcule a largura e a altura do contêiner
-        let width = Math.abs(clientX - this.startNewEdgeX);
-        let height = Math.abs(clientY - this.startNewEdgeY);
-
-        // Ajuste a altura mínima do contêiner para a altura do marker
-        const minHeight = this.markerSize + 40;
-        if (height < minHeight) {
-            height = minHeight;
-        }
-
-        const minWidth = this.markerSize + 40;
-        if (width < minWidth) {
-            width = minWidth;
-        }
-
-
-        // Calcule as margens de 50% a mais do elementContainer
-        const marginX = width * 0.50;
-        const marginY = height * 0.50;
-
-        this.newEdge.elementContainer.style.left = `${Math.min(this.startNewEdgeX, clientX) - marginX}px`;
-        this.newEdge.elementContainer.style.top = `${Math.min(this.startNewEdgeY, clientY) - marginY}px`;
+    
+        // Obter a posição do EdgesComponent em relação à tela
+        const rect = this.getBoundingClientRect();
+    
+        // Converter as coordenadas do mouse para o espaço do FlowChart (sem translate, como em updateEdgePositions)
+        const endX = (clientX - rect.left) / scale;
+        const endY = (clientY - rect.top) / scale;
+    
+        const startX = this.startNewEdgeX;
+        const startY = this.startNewEdgeY;
+    
+        // Calcular a largura e altura do contêiner (sem scale, como em updateEdgePositions)
+        let width = Math.abs(endX - startX);
+        let height = Math.abs(endY - startY);
+    
+        // Definir dimensões mínimas
+        const minSize = this.markerSize + 40;
+        width = Math.max(width, minSize);
+        height = Math.max(height, minSize);
+    
+        // Calcular margens (50% a mais)
+        const marginX = width * 0.5;
+        const marginY = height * 0.5;
+    
+        // Posicionar o contêiner SVG (sem scale no cálculo de posição, apenas nas dimensões)
+        this.newEdge.elementContainer.style.left = `${Math.min(startX, endX) - marginX}px`;
+        this.newEdge.elementContainer.style.top = `${Math.min(startY, endY) - marginY}px`;
         this.newEdge.elementContainer.style.width = `${width + 2 * marginX}px`;
         this.newEdge.elementContainer.style.height = `${height + 2 * marginY}px`;
-
-        // Ajuste as coordenadas dos elementos internos
-        const adjustedStartX = (this.startNewEdgeX - Math.min(this.startNewEdgeX, clientX) + marginX);
-        const adjustedStartY = (this.startNewEdgeY - Math.min(this.startNewEdgeY, clientY) + marginY);
-        const adjustedEndX = (clientX - Math.min(this.startNewEdgeX, clientX) + marginX - this.markerSize / scale);
-        const adjustedEndY = (clientY - Math.min(this.startNewEdgeY, clientY) + marginY - 8);        
-        
-
-        const edgeElement = this.newEdge.element;        
-
+    
+        // Ajustar as coordenadas internas relativas ao contêiner SVG (sem scale adicional)
+        const adjustedStartX = startX - Math.min(startX, endX) + marginX;
+        const adjustedStartY = startY - Math.min(startY, endY) + marginY;
+        const adjustedEndX = endX - Math.min(startX, endX) + marginX;
+        const adjustedEndY = endY - Math.min(startY, endY) + marginY;
+    
+        const edgeElement = this.newEdge.element;
+    
         if (edgeElement instanceof SVGLineElement) {
             edgeElement.setAttribute("x1", adjustedStartX.toString());
             edgeElement.setAttribute("y1", adjustedStartY.toString());
@@ -324,10 +322,10 @@ export class EdgesComponent extends HTMLElement {
                 M ${adjustedStartX} ${adjustedStartY}
                 L ${adjustedEndX} ${adjustedEndY}
             `;
-            edgeElement.setAttribute('d', d);
+            edgeElement.setAttribute("d", d);
         }
-
-        this.newEdge.elementContainer.style.display = 'block';
+    
+        this.newEdge.elementContainer.style.display = "block";
     }
 
     private onMouseUp(event: MouseEvent) {
@@ -340,37 +338,51 @@ export class EdgesComponent extends HTMLElement {
         }
     }
 
-    public startNewEdgeFromNode(startNode: NodeComponent, outputIndex: number, ) {
+    public startNewEdgeFromNode(startNode: NodeComponent, outputIndex: number) {
         const startRect = startNode.outputsElement[outputIndex].getBoundingClientRect();
-        const startX = (startRect.left + (startRect.width / 2) - this.getBoundingClientRect().left) / this.props.flowchart.scale;
-        const startY = (startRect.top + (startRect.height / 2) - this.getBoundingClientRect().top) / this.props.flowchart.scale;
-
+        const containerRect = this.getBoundingClientRect();
+        const scale = this.props.flowchart.scale;
+    
+        // Calcular a posição inicial no espaço do FlowChart (sem translate, como em updateEdgePositions)
+        const startX = (startRect.left + startRect.width / 2 - containerRect.left) / scale;
+        const startY = (startRect.top + startRect.height / 2 - containerRect.top) / scale;
+    
         this.currentStartNode = startNode;
-        this.currentOutputIndex = outputIndex;        
-        this.hasNewEdge = true;        
-        this.newEdge.elementContainer.style.display = 'block';
-        this.newEdge.elementContainer.style.left = startX + "px";
-        this.newEdge.elementContainer.style.top = startX + "px";
-
+        this.currentOutputIndex = outputIndex;
+        this.hasNewEdge = true;
+        this.newEdge.elementContainer.style.display = "block";
+    
+        // Definir a posição inicial
         this.startNewEdgeX = startX;
         this.startNewEdgeY = startY;
-
+    
+        // Configurar o container SVG com tamanho mínimo inicial (como em updateEdgePositions)
+        const minSize = this.markerSize + 40;
+        const marginX = minSize * 0.5;
+        const marginY = minSize * 0.5;
+    
+        this.newEdge.elementContainer.style.left = `${startX - marginX}px`;
+        this.newEdge.elementContainer.style.top = `${startY - marginY}px`;
+        this.newEdge.elementContainer.style.width = `${minSize + 2 * marginX}px`;
+        this.newEdge.elementContainer.style.height = `${minSize + 2 * marginY}px`;
+    
+        // Coordenadas internas relativas ao container (ajustadas como em updateEdgePositions)
+        const adjustedStartX = marginX; // Centro do container inicialmente
+        const adjustedStartY = marginY;
+    
         if (this.newEdge.element instanceof SVGLineElement) {
-            this.newEdge.element.setAttribute("x1", this.startNewEdgeX.toString());
-            this.newEdge.element.setAttribute("y1", this.startNewEdgeY.toString());
-            this.newEdge.element.setAttribute("x2", startX.toString());
-            this.newEdge.element.setAttribute("y2", startY.toString());
+            this.newEdge.element.setAttribute("x1", adjustedStartX.toString());
+            this.newEdge.element.setAttribute("y1", adjustedStartY.toString());
+            this.newEdge.element.setAttribute("x2", adjustedStartX.toString());
+            this.newEdge.element.setAttribute("y2", adjustedStartY.toString());
         } else if (this.newEdge.element instanceof SVGPathElement) {
-            const d = `
-                M ${startX} ${startY}
-                L ${startX} ${startY}
-            `;
-            this.newEdge.element.setAttribute('d', d);
+            const d = `M ${adjustedStartX} ${adjustedStartY} L ${adjustedStartX} ${adjustedStartY}`;
+            this.newEdge.element.setAttribute("d", d);
         }
     }
 
     public endNewEdgeAtNode(endNode: NodeComponent, inputIndex: number) {
-        const existsEdge = this.props.actives.some(active => active.endNode === endNode && active.inputTarget === inputIndex && active.outputTarget === this.currentOutputIndex && active.startNode === this.currentStartNode)
+        const existsEdge = this.props.actives.some(active => active.endNode === endNode && active.inputTarget === inputIndex && active.outputTarget === this.currentOutputIndex && active.startNode === this.currentStartNode);
         
         if (this.currentStartNode != endNode && !existsEdge) {
             const newEdge = {
@@ -378,13 +390,13 @@ export class EdgesComponent extends HTMLElement {
                 endNode,
                 inputTarget: inputIndex,
                 outputTarget: this.currentOutputIndex
-            }
+            };
             const elementPath = this.createEdgeElementPath();
             const elementLine = this.createEdgeElementLine();
             let element!: SVGLineElement | SVGPathElement;
 
             const edgeContainer = document.createElementNS
-            ('http://www.w3.org/2000/svg', 'svg');;
+            ('http://www.w3.org/2000/svg', 'svg');
             edgeContainer.setAttribute('xmlns', "http://www.w3.org/2000/svg");
             edgeContainer.setAttribute('version', '1.1');
             edgeContainer.innerHTML = `
@@ -395,7 +407,7 @@ export class EdgesComponent extends HTMLElement {
                 orient="auto-start-reverse">
                 <path d="M 0 0 L 10 5 L 0 10 z" />
             </marker>
-            `
+            `;
             edgeContainer.classList.add('edge-container');
 
             if (elementPath) {
@@ -418,7 +430,7 @@ export class EdgesComponent extends HTMLElement {
             
             this.updateEdgePositions();
             this.nodesObserver.observe(this.currentStartNode!, { attributes: true });
-            this.nodesObserver.observe(endNode, { attributes: true })
+            this.nodesObserver.observe(endNode, { attributes: true });
         }        
         this.hasNewEdge = false;
         this.newEdge.elementContainer.style.display = 'none';
