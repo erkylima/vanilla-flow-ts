@@ -36,6 +36,9 @@ export class App extends HTMLElement {
         this.shadowRoot.appendChild(flowChart);
         let doc = document.createElement('button')
         doc.innerText = 'Add Node';
+        doc.addEventListener('click', () => {
+            flowChart.addNode({ id: 2, x: 200, y: 200, inputs: 1, outputs: 1 });
+        });
         
         this.shadowRoot.appendChild(doc)
         
