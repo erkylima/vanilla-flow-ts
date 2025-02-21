@@ -11,12 +11,12 @@ Este projeto é uma biblioteca UI baseada em Web Components e TypeScript, projet
 
 Para começar a usar a biblioteca, você pode instalá-la via npm ou yarn:
 
-`npm install vanilla-flow-ts # ou yarn add vanilla-flow-ts`
+`npm install vanilla-flow-ts` ou `yarn add vanilla-flow-ts`
 
 ## Uso
 
 Após a instalação, você pode importar os componentes desejados em seu projeto e começar a usá-los. Por exemplo:
-
+```typescript
 import { FlowChart, FlowChartConfig } from "vanilla-flow-ts";
 
 const nodesConfig = [
@@ -44,6 +44,7 @@ const flowChartConfig: FlowChartConfig = {
 
 const flowChart = new FlowChart(flowChartConfig);
 document.body.appendChild(flowChart);
+```
 
 ## Desenvolvimento
 
