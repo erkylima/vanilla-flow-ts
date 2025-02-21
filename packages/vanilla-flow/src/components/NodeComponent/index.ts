@@ -21,7 +21,7 @@ export class NodeComponent extends HTMLElement {
     public inputsElement: Array<HTMLElement> = new Array<HTMLElement>();
     public outputsElement: Array<HTMLElement> = new Array<HTMLElement>();
     private isDragging: boolean = false;
-    private shadow: ShadowRoot
+    private readonly shadow: ShadowRoot
     constructor(props: NodeProps) {
         super();
         this.id = props.id +"";
@@ -183,7 +183,7 @@ export class NodeComponent extends HTMLElement {
 
     private onMouseMove(event: MouseEvent) {
         if (!this.isDragging) return;
-        let scale = (this.props.flowChart?.scale || 1);
+        let scale = (this.props.flowChart?.scale ?? 1);
         const dx = (event.clientX - this.initialX) / scale;
         const dy = (event.clientY - this.initialY) / scale ;    
         this.props.x = this.initialNodeX + dx;

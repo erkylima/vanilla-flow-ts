@@ -10,7 +10,7 @@ export interface FlowChartConfig {
 }
 
 export class FlowChart extends HTMLElement {
-    private nodes: NodeComponent[] = [];
+    private readonly nodes: NodeComponent[] = [];
     edgesComponent!: EdgesComponent;
     board!: HTMLElement;
     wrapper!: HTMLElement;
@@ -117,8 +117,7 @@ export class FlowChart extends HTMLElement {
         
         this.translateX -= originDeltaX * (newScale / this.scale - 1);
         this.translateY -= originDeltaY * (newScale / this.scale - 1);
-        // if (this.translateX > 0) this.translateX = 0;
-        // if (this.translateY > 0) this.translateY = 0;
+
         this.scale = newScale;
 
         this.updateTransform();
@@ -150,8 +149,6 @@ export class FlowChart extends HTMLElement {
         this.translateX += deltaX;
         this.translateY += deltaY;
 
-        // if (this.translateX > 0) this.translateX = 0;
-        // if (this.translateY > 0) this.translateY = 0;
 
         this.updateTransform();
     }

@@ -1,5 +1,5 @@
 import { FlowChart } from "../FlowChart/index";
-import { NodeComponent, NodeProps } from "../NodeComponent/index";
+import { NodeComponent } from "../NodeComponent/index";
 
 export interface EdgeProps {
     actives: Array<{
@@ -20,8 +20,8 @@ interface EdgeExchange {
 
 export class EdgesComponent extends HTMLElement {
     props: EdgeProps;
-    private edgeElements: Array<EdgeExchange> = [];
-    private markerSize = 8; // Tamanho do marker
+    private readonly edgeElements: Array<EdgeExchange> = [];
+    private readonly markerSize = 8; // Tamanho do marker
     private newEdge!: EdgeExchange;    
     private startNewEdgeX!: number;
     private startNewEdgeY!: number;
@@ -183,8 +183,7 @@ export class EdgesComponent extends HTMLElement {
 
     updateEdgePositions() {
         const scale = this.props.flowchart.scale;
-        const translateX = this.props.flowchart.translateX;
-        const translateY = this.props.flowchart.translateY;
+
 
         this.edgeElements.forEach((edgeElement, index) => {
         
