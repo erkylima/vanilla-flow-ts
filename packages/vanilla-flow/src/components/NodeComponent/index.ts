@@ -10,7 +10,8 @@ export interface NodeProps {
     header?: string;
     content?: string;
     flowChart?: FlowChart;
-    cssImports?: string;
+    cssImports?: string[];
+    iconCss?: string;
     nodeCss?: string;
     headerCss?: string;
     contentCss?: string;
@@ -86,9 +87,12 @@ export class NodeComponent extends HTMLElement {
     }
 
     private render() {
+        const imports = this.props.cssImports
+        ? this.props.cssImports.map(cssImport => `@import url('${cssImport}');`).join('\n')
+        : '';
         this.shadow.innerHTML = `
-            <style>
-                ${this.props.cssImports || ''}
+            <style>               
+                ${imports}
                 :host {
                     display: flex;
                     flex-direction: column;
@@ -117,6 +121,10 @@ export class NodeComponent extends HTMLElement {
                 :host(.active) {
                     border: 1px solid #e38c29;
                     z-index: 100;
+                }
+
+                .icon {
+                    ${this.props.iconCss || ''}
                 }
                 .inputs {
                     pointer-events: none;

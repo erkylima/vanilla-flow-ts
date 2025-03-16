@@ -6,7 +6,7 @@ export interface FlowChartConfig {
     edges: { startNodeIndex: number; endNodeIndex: number; inputTarget: number; outputTarget: number; }[];
     edgeCss?: CSSStyleSheet;
     flowCss?: CSSStyleSheet;
-    cssImports?: string;
+    cssImports?: string[];
     nodeCss?: string;
     headerCss?: string;
     contentCss?: string;
@@ -78,7 +78,14 @@ export class FlowChart extends HTMLElement {
         this.wrapper.addEventListener('wheel', this.onMouseWheel.bind(this));
     }
 
-    private initializeNodes(nodesConfig: NodeProps[], cssImports?: string,nodeCss?: string, headerCss?: string, contentCss?: string) {
+    private initializeNodes(nodesConfig: NodeProps[], cssImports?: string[], nodeCss?: string, headerCss?: string, contentCss?: string) {
+        cssImports?.forEach(cssImport => {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = cssImport;
+            document.head.appendChild(link);
+        }
+        );
         nodesConfig.forEach(nodeConfig => {
             nodeConfig.flowChart = this;
             nodeConfig.cssImports = cssImports;
