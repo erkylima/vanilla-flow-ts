@@ -10,6 +10,8 @@ export interface NodeProps {
     header?: string;
     content?: string;
     flowChart?: FlowChart;
+    cssImports?: string;
+    nodeCss?: string;
     headerCss?: string;
     contentCss?: string;
 }
@@ -86,6 +88,7 @@ export class NodeComponent extends HTMLElement {
     private render() {
         this.shadow.innerHTML = `
             <style>
+                ${this.props.cssImports || ''}
                 :host {
                     display: flex;
                     flex-direction: column;
@@ -97,12 +100,16 @@ export class NodeComponent extends HTMLElement {
                     box-shadow: 1px 1px 11px -6px rgba(0, 0, 0, 0.75);
                     user-select: none;
                     z-index: 1;
+                    text-align: center;
                     padding: 0px;
                     width: 100px;
                     height: auto;
                     transition: border ease 0.2s, box-shadow ease 0.2s;
                     align-content: center;
                     align-items: center;
+                    ${this.props.nodeCss || ''}
+
+
                 }
                 :host(:hover){
                     box-shadow: 2px 2px 12px -6px rgba(0, 0, 0, 0.75);
@@ -151,9 +158,11 @@ export class NodeComponent extends HTMLElement {
                 .header {
                     font-weight: bold;
                     margin-bottom: 5px;
+                    width: 100%;
                     ${this.props.headerCss || ''}
                 }
                 .content {
+                    width: 100%;
                     text-align: center;
                     ${this.props.contentCss || ''}
                 }

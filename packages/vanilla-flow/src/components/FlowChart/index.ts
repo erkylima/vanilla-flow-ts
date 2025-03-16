@@ -5,8 +5,9 @@ export interface FlowChartConfig {
     nodes: NodeProps[];
     edges: { startNodeIndex: number; endNodeIndex: number; inputTarget: number; outputTarget: number; }[];
     edgeCss?: CSSStyleSheet;
-    nodeCss?: CSSStyleSheet;
     flowCss?: CSSStyleSheet;
+    cssImports?: string;
+    nodeCss?: string;
     headerCss?: string;
     contentCss?: string;
 }
@@ -23,14 +24,15 @@ export class FlowChart extends HTMLElement {
     private startX: number = 0;
     private startY: number = 0;
     private isDraggingNode: boolean = false;
-
+    private props: FlowChartConfig;
     constructor(config: FlowChartConfig) {
         super();
         this.render();
         this.addEventListener('contextmenu', (e) => {
             e.preventDefault();
         });
-        this.initializeNodes(config.nodes, config.headerCss, config.contentCss);
+        this.props = config;
+        this.initializeNodes(config.nodes, config.cssImports, config.nodeCss, config.headerCss, config.contentCss);
         this.initializeEdges(config.edges);
     }
 
@@ -76,9 +78,11 @@ export class FlowChart extends HTMLElement {
         this.wrapper.addEventListener('wheel', this.onMouseWheel.bind(this));
     }
 
-    private initializeNodes(nodesConfig: NodeProps[], headerCss?: string, contentCss?: string) {
+    private initializeNodes(nodesConfig: NodeProps[], cssImports?: string,nodeCss?: string, headerCss?: string, contentCss?: string) {
         nodesConfig.forEach(nodeConfig => {
             nodeConfig.flowChart = this;
+            nodeConfig.cssImports = cssImports;
+            nodeConfig.nodeCss = nodeConfig.nodeCss ? nodeConfig.nodeCss : nodeCss;
             nodeConfig.headerCss = headerCss;
             nodeConfig.contentCss = contentCss;
             const node = new NodeComponent(nodeConfig);
