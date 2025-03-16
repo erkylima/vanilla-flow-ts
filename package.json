@@ -3,7 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "Érky Lima",
-  "license": "MIT",
   "description": "This is a Node Based UI Library with WebComponent support",
   "main": "dist/main.js",
   "types": "dist/index.d.ts",

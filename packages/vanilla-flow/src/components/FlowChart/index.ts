@@ -7,6 +7,8 @@ export interface FlowChartConfig {
     edgeCss?: CSSStyleSheet;
     nodeCss?: CSSStyleSheet;
     flowCss?: CSSStyleSheet;
+    headerCss?: string;
+    contentCss?: string;
 }
 
 export class FlowChart extends HTMLElement {
@@ -25,8 +27,10 @@ export class FlowChart extends HTMLElement {
     constructor(config: FlowChartConfig) {
         super();
         this.render();
-        this.addEventListener('contextmenu', (e) => e.preventDefault());
-        this.initializeNodes(config.nodes);
+        this.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+        this.initializeNodes(config.nodes, config.headerCss, config.contentCss);
         this.initializeEdges(config.edges);
     }
 
@@ -70,12 +74,13 @@ export class FlowChart extends HTMLElement {
         window.addEventListener('mouseup', this.onMouseUp.bind(this));
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
         this.wrapper.addEventListener('wheel', this.onMouseWheel.bind(this));
-
     }
 
-    private initializeNodes(nodesConfig: NodeProps[]) {
+    private initializeNodes(nodesConfig: NodeProps[], headerCss?: string, contentCss?: string) {
         nodesConfig.forEach(nodeConfig => {
             nodeConfig.flowChart = this;
+            nodeConfig.headerCss = headerCss;
+            nodeConfig.contentCss = contentCss;
             const node = new NodeComponent(nodeConfig);
             this.nodes.push(node);
             this.board?.appendChild(node);
@@ -97,10 +102,10 @@ export class FlowChart extends HTMLElement {
         this.board?.appendChild(this.edgesComponent);
     }
 
-
     public notifyNodeDragging(isDragging: boolean): void {
         this.isDraggingNode = isDragging;
     }
+
     private onMouseWheel(event: WheelEvent): void {
         event.preventDefault();
     
@@ -108,10 +113,8 @@ export class FlowChart extends HTMLElement {
         const zoomFactor = 0.1;
         const newScale = this.scale * (deltaY > 0 ? (1 - zoomFactor) : (1 + zoomFactor));
 
-        // Limit the scale to avoid too much zooming in or out
         if (newScale < 0.1 || newScale > 3) return;
 
-        // Adjust origin to zoom around the mouse position
         const originDeltaX = offsetX - this.translateX;
         const originDeltaY = offsetY - this.translateY;
         
@@ -123,12 +126,8 @@ export class FlowChart extends HTMLElement {
         this.updateTransform();
     }
 
-
-    
     private onMouseDown(event: MouseEvent): void {
-        // alert(event.clientX + "board")
-
-        if (event.button !== 2) return; // Only handle right mouse button
+        if (event.button !== 2) return;
 
         this.isPanning = true;
         this.startX = event.clientX;
@@ -149,7 +148,6 @@ export class FlowChart extends HTMLElement {
         this.translateX += deltaX;
         this.translateY += deltaY;
 
-
         this.updateTransform();
     }
 
@@ -161,11 +159,9 @@ export class FlowChart extends HTMLElement {
 
     updateTransform() {
         this.board.style.transform = `translate(${this.translateX}px, ${this.translateY}px) scale(${this.scale})`;
-        
-        
-        this.wrapper.style.backgroundPositionX = this.translateX+"px";
-        this.wrapper.style.backgroundPositionY = this.translateY+"px";  
-        this.nodes.forEach(node => {node.setPosition(node.props.x,node.props.y);});
+        this.wrapper.style.backgroundPositionX = this.translateX + "px";
+        this.wrapper.style.backgroundPositionY = this.translateY + "px";  
+        this.nodes.forEach(node => { node.setPosition(node.props.x, node.props.y); });
     }
 
     public addNode(nodeProps: NodeProps): void {
@@ -177,8 +173,6 @@ export class FlowChart extends HTMLElement {
         this.board.appendChild(node);
         this.edgesComponent?.updateEdgePositions();
     }
-
-    
 }
 
 customElements.define("flow-chart", FlowChart);

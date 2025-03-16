@@ -7,7 +7,11 @@ export interface NodeProps {
     y: number;
     inputs: number;
     outputs: number;
+    header?: string;
+    content?: string;
     flowChart?: FlowChart;
+    headerCss?: string;
+    contentCss?: string;
 }
 
 export class NodeComponent extends HTMLElement {
@@ -21,10 +25,11 @@ export class NodeComponent extends HTMLElement {
     public inputsElement: Array<HTMLElement> = new Array<HTMLElement>();
     public outputsElement: Array<HTMLElement> = new Array<HTMLElement>();
     private isDragging: boolean = false;
-    private readonly shadow: ShadowRoot
+    private readonly shadow: ShadowRoot;
+
     constructor(props: NodeProps) {
         super();
-        this.id = props.id +"";
+        this.id = props.id + "";
         this.shadow = this.attachShadow({ mode: 'open' });
         this.props = props;
         this.setPosition(props.x, props.y);
@@ -44,14 +49,14 @@ export class NodeComponent extends HTMLElement {
         this.addEventListener('mousedown', this.onMouseDown.bind(this));
     }
 
-    populateInputPoints(length: number) {                
+    populateInputPoints(length: number) {
         for (let i = 0; i < length; i++) {
-            const element = document.createElement("div");                
+            const element = document.createElement("div");
             element.className = 'input';
-            
+
             element.addEventListener("mouseup", (e) => {
                 e.preventDefault();
-                if(this.props.flowChart?.edgesComponent?.hasNewEdge)
+                if (this.props.flowChart?.edgesComponent?.hasNewEdge)
                     this.endNewEdge(e, i);
             });
             this.inputsElement.push(element);
@@ -61,9 +66,9 @@ export class NodeComponent extends HTMLElement {
 
     populateOutputPoints(length: number) {
         for (let i = 0; i < length; i++) {
-            const element = document.createElement("div");                
+            const element = document.createElement("div");
             element.className = 'output';
-            
+
             element.addEventListener("mousedown", (e) => {
                 e.stopPropagation();
                 this.startNewEdge(e, i);
@@ -92,9 +97,9 @@ export class NodeComponent extends HTMLElement {
                     box-shadow: 1px 1px 11px -6px rgba(0, 0, 0, 0.75);
                     user-select: none;
                     z-index: 1;
-                    padding: 10px;
-                    width:50px;
-                    height: 50px;
+                    padding: 0px;
+                    width: 100px;
+                    height: auto;
                     transition: border ease 0.2s, box-shadow ease 0.2s;
                     align-content: center;
                     align-items: center;
@@ -103,28 +108,19 @@ export class NodeComponent extends HTMLElement {
                     box-shadow: 2px 2px 12px -6px rgba(0, 0, 0, 0.75);
                 }
                 :host(.active) {
-                    display: flex;
-                    flex-direction: column;
-                    position: absolute;
-                    cursor: grab;
-                    background-color: white;
                     border: 1px solid #e38c29;
-                    border-radius: 6px;
-                    box-shadow: 1px 1px 11px -6px rgba(0, 0, 0, 0.75);
-                    user-select: none;
                     z-index: 100;
-                    transition: border ease 0.2s, box-shadow ease 0.2s;
                 }
                 .inputs {
                     pointer-events: none;
                     cursor: initial;
-                    position: absolute;                    
+                    position: absolute;
                     left: calc(12px * -0.1);
                     display: flex;
                     flex-direction: column;
                     top: 50%;
                     transform: translate(-50%,-50%);
-                    }
+                }
                 .input {
                     pointer-events: all;
                     cursor: initial;
@@ -136,17 +132,15 @@ export class NodeComponent extends HTMLElement {
                 }
                 .outputs {
                     pointer-events: none;
-                    z-index: -3;
-                    position: absolute;                    
+                    position: absolute;
                     right: calc(12px * -1.5);
                     display: flex;
                     flex-direction: column;
                     top: 50%;
-                    transform: translate(-50%,-50%)
+                    transform: translate(-50%,-50%);
                 }
                 .output {
                     pointer-events: all;
-                    cursor: crosshair;
                     background-color: #e38b29;
                     width: 12px;
                     height: 12px;
@@ -154,10 +148,20 @@ export class NodeComponent extends HTMLElement {
                     margin: 5px 0px;
                     box-shadow: 1px 1px 11px -6px rgba(0, 0, 0, 0.75);
                 }
+                .header {
+                    font-weight: bold;
+                    margin-bottom: 5px;
+                    ${this.props.headerCss || ''}
+                }
+                .content {
+                    text-align: center;
+                    ${this.props.contentCss || ''}
+                }
             </style>
             <div class="inputs"></div>
+            <div class="header">${this.props.header || 'Header'}</div>
+            <div class="content">${this.props.content || 'Content'}</div>
             <div class="outputs"></div>
-            <p>Text</p>
         `;
     }
 
@@ -165,17 +169,16 @@ export class NodeComponent extends HTMLElement {
         event.preventDefault();
         this.isDragging = true;
         const rect = this.getBoundingClientRect();
-        this.offsetX = (event.clientX - rect.left) ;
-        this.offsetY = (event.clientY - rect.top) ;    
+        this.offsetX = (event.clientX - rect.left);
+        this.offsetY = (event.clientY - rect.top);
         this.initialX = event.clientX;
         this.initialY = event.clientY;
-        this.initialNodeX = this.props.x
-        this.initialNodeY = this.props.y
+        this.initialNodeX = this.props.x;
+        this.initialNodeY = this.props.y;
 
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
         window.addEventListener('mouseup', this.onMouseUp.bind(this));
 
-        // Notificar o FlowChart de que um nó está sendo arrastado
         if (this.props.flowChart) {
             this.props.flowChart.notifyNodeDragging(true);
         }
@@ -185,7 +188,7 @@ export class NodeComponent extends HTMLElement {
         if (!this.isDragging) return;
         let scale = (this.props.flowChart?.scale ?? 1);
         const dx = (event.clientX - this.initialX) / scale;
-        const dy = (event.clientY - this.initialY) / scale ;    
+        const dy = (event.clientY - this.initialY) / scale;
         this.props.x = this.initialNodeX + dx;
         this.props.y = this.initialNodeY + dy;
         this.setPosition(this.props.x, this.props.y);
