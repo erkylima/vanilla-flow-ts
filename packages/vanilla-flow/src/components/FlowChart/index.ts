@@ -3,7 +3,7 @@ import { EdgesComponent, EdgeProps } from "../EdgesComponent/index";
 
 export interface FlowChartConfig {
     nodes: NodeProps[];
-    edges: { startNodeIndex: number; endNodeIndex: number; inputTarget: number; outputTarget: number; }[];
+    edges: { startNodeIndex: number; endNodeIndex: number; inputTarget: number; outputTarget: number; edgeIndex?: string; }[];
     edgeCss?: CSSStyleSheet;
     flowCss?: string;
     cssImports?: string[];
