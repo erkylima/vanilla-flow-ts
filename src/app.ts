@@ -5,7 +5,7 @@ export class App extends HTMLElement {
     connectedCallback() {
 
         const nodesConfig = [
-            { id: 1, x: 300, y: 160, inputs: 0, outputs: 2,nodeCss: 'background: rgb(240, 216, 3);; color: white; text-align: center;', header: 'Node 1', content: '<i class="fas fa-bath"></i> Content 1' },
+            { id: 1, x: 300, y: 160, inputs: 0, outputs: 2, nodeCss: 'background: rgb(240, 216, 3);; color: white; text-align: center;', header: 'Node 1', content: '<i class="fas fa-bath"></i> Content 1' },
             { id: 2, x: 500, y: 260, inputs: 1, outputs: 1, iconCss: 'color: red; font-size: 16px;', header: 'Node 2', content: '<i class="fas fa-heart icon"></i> Content 2' },
             { id: 3, x: 500, y: 60, inputs: 1, outputs: 1, header: 'Node 3', content: '<i class="fas fa-chart-line"></i> Content 3' },
             { id: 4, x: 800, y: 160, inputs: 2, outputs: 2, header: 'Node 4', content: '<i class="fas fa-network-wired"></i> Content 4' },
@@ -44,6 +44,7 @@ export class App extends HTMLElement {
 
         const flowChart = new FlowChart(flowChartConfig);
         this.appendChild(flowChart);
+
         const addNodeButton = document.createElement('button');
         addNodeButton.innerHTML = '<i class="fas fa-plus"></i> Add Node';
         addNodeButton.addEventListener('click', () => {
@@ -58,12 +59,43 @@ export class App extends HTMLElement {
             });
         });
 
+        const exportButton = document.createElement('button');
+        exportButton.innerHTML = '<i class="fas fa-download"></i> Export Nodes & Edges';
+        exportButton.addEventListener('click', () => {
+            const exportedData = {
+                nodes: flowChartConfig.nodes.map(node => ({
+                    id: node.id,
+                    x: node.x,
+                    y: node.y,
+                    inputs: node.inputs,
+                    outputs: node.outputs,
+                    header: node.header,
+                    content: node.content
+                })),
+                edges: flowChartConfig.edges.map(edge => ({
+                    startNodeIndex: edge.startNodeIndex,
+                    endNodeIndex: edge.endNodeIndex,
+                    outputTarget: edge.outputTarget,
+                    inputTarget: edge.inputTarget
+                }))
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportedData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "flowchart.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        });
+
         this.appendChild(addNodeButton);
+        this.appendChild(exportButton);
 
         const style = document.createElement('style');
         style.textContent = `
             button {
                 margin-top: 10px;
+                margin-right: 10px;
                 padding: 10px 20px;
                 font-size: 14px;
                 cursor: pointer;

@@ -15,6 +15,7 @@ export interface NodeProps {
     nodeCss?: string;
     headerCss?: string;
     contentCss?: string;
+    data?: Record<string, any>; // Added to store node information
 }
 
 export class NodeComponent extends HTMLElement {
@@ -231,6 +232,14 @@ export class NodeComponent extends HTMLElement {
 
     endNewEdge(event: MouseEvent, inputIndex: number) {
         this.props.flowChart!.edgesComponent.endNewEdgeAtNode(this, inputIndex);
+    }
+
+    public getData(): Record<string, any> | undefined {
+        return this.props.data;
+    }
+
+    public setData(data: Record<string, any>): void {
+        this.props.data = data;
     }
 }
 
