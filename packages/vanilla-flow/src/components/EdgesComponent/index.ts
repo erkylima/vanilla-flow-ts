@@ -2,13 +2,16 @@ import { FlowChart } from "../FlowChart/index";
 import { NodeComponent } from "../NodeComponent/index";
 
 export interface EdgeProps {
-    actives: Array<{
-        startNode: NodeComponent;
-        endNode: NodeComponent;
-        inputTarget: number;
-        outputTarget: number;
-    }>;
+    actives: Array<Edge>;
     flowchart: FlowChart;
+}
+
+interface Edge {
+    startNode: NodeComponent;
+    endNode: NodeComponent;
+    inputTarget: number;
+    outputTarget: number;
+    edgeIndex?: string;
 }
 
 interface EdgeExchange {
@@ -45,6 +48,10 @@ export class EdgesComponent extends HTMLElement {
 
     connectedCallback() {
         this.updateEdgePositions();
+    }
+
+    private createEdgeIndex(startNode: NodeComponent, outputIndex: number, endNode: NodeComponent, inputIndex: number): string {
+        return `${startNode.id}-${outputIndex}-${endNode.id}-${inputIndex}`;
     }
 
     private startNewEdge(){
@@ -134,6 +141,10 @@ export class EdgesComponent extends HTMLElement {
                 const inputTarget = active.inputTarget;
                 const outputTarget = active.outputTarget;
 
+                if (!active.edgeIndex) {
+                    active.edgeIndex = this.createEdgeIndex(active.startNode, active.outputTarget, active.endNode, active.inputTarget);
+                }
+
                 active.startNode.outputsElement.forEach((_, index) => {
                     if (index === outputTarget && inputTarget < active.endNode.inputsElement.length) {
                         const elementPath = this.createEdgeElementPath();
@@ -171,9 +182,24 @@ export class EdgesComponent extends HTMLElement {
                             elementPath: elementPath,
                             elementLine: elementLine
                         });
+                        edgeContainer.addEventListener('dblclick', () => {
+                            this.removeEdge(active.edgeIndex!);
+                        });
                     }
+                    
                 });
             });                       
+        }
+    }
+
+    private removeEdge(edgeIndex: string) {
+        const edgeIndexToRemove = this.props.actives.findIndex(active => active.edgeIndex === edgeIndex);
+        if (edgeIndexToRemove !== -1) {
+            const edgeElement = this.edgeElements[edgeIndexToRemove];
+            edgeElement.elementContainer.remove();
+            this.edgeElements.splice(edgeIndexToRemove, 1);
+            this.props.actives.splice(edgeIndexToRemove, 1);
+            this.props.flowchart.getConfig().edges.splice(edgeIndexToRemove, 1);
         }
     }
 
@@ -384,11 +410,13 @@ export class EdgesComponent extends HTMLElement {
         const existsEdge = this.props.actives.some(active => active.endNode === endNode && active.inputTarget === inputIndex && active.outputTarget === this.currentOutputIndex && active.startNode === this.currentStartNode);
         
         if (this.currentStartNode != endNode && !existsEdge) {
-            const newEdge = {
+
+            const newEdge: Edge = {
                 startNode: this.currentStartNode!,
                 endNode,
                 inputTarget: inputIndex,
-                outputTarget: this.currentOutputIndex
+                outputTarget: this.currentOutputIndex,
+                edgeIndex: this.createEdgeIndex(this.currentStartNode!, this.currentOutputIndex, endNode, inputIndex)
             };
             const elementPath = this.createEdgeElementPath();
             const elementLine = this.createEdgeElementLine();
@@ -424,6 +452,10 @@ export class EdgesComponent extends HTMLElement {
                 elementContainer: edgeContainer,
                 elementPath: elementPath,
                 elementLine: elementLine
+            });
+            
+            edgeContainer.addEventListener('dblclick', () => {
+                this.removeEdge(newEdge.edgeIndex!);
             });
             this.props.actives.push(newEdge);
             
