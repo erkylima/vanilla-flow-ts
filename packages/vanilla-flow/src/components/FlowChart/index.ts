@@ -5,7 +5,7 @@ export interface FlowChartConfig {
     nodes: NodeProps[];
     edges: { startNodeIndex: number; endNodeIndex: number; inputTarget: number; outputTarget: number; }[];
     edgeCss?: CSSStyleSheet;
-    flowCss?: CSSStyleSheet;
+    flowCss?: string;
     cssImports?: string[];
     nodeCss?: string;
     headerCss?: string;
@@ -24,14 +24,14 @@ export class FlowChart extends HTMLElement {
     private startX: number = 0;
     private startY: number = 0;
     private isDraggingNode: boolean = false;
-    private props: FlowChartConfig;
+    private config: FlowChartConfig;
     constructor(config: FlowChartConfig) {
         super();
+        this.config = config;    
         this.render();
         this.addEventListener('contextmenu', (e) => {
             e.preventDefault();
         });
-        this.props = config;
         this.initializeNodes(config.nodes, config.cssImports, config.nodeCss, config.headerCss, config.contentCss);
         this.initializeEdges(config.edges);
     }
@@ -49,6 +49,7 @@ export class FlowChart extends HTMLElement {
                 cursor: grab;                   
                 background-size: 30px 30px;
                 background-image: radial-gradient(circle, #b8b8b8bf 1px, rgba(0, 0, 0, 0) 1px);
+                ${this.config?.flowCss || ''}
             }
             .wrapper:active {
                 cursor: grabbing;
@@ -183,6 +184,10 @@ export class FlowChart extends HTMLElement {
         this.nodes.push(node);
         this.board.appendChild(node);
         this.edgesComponent?.updateEdgePositions();
+    }
+
+    public getConfig(): FlowChartConfig {
+        return this.config;
     }
 }
 

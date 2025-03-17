@@ -1,95 +1,76 @@
-
 import { FlowChart, FlowChartConfig } from '../packages/vanilla-flow/src/index';
 
 export class App extends HTMLElement {
     connectedCallback() {
+        const container = document.createElement('div');
+        container.style.cssText = `
+            display: grid;
+            grid-template-rows: auto 1fr;
+            grid-template-columns: 250px 1fr;
+            height: 100vh;
+            margin: 0;
+        `;
+        this.appendChild(container);
 
-        const nodesConfig = [
-            { id: 1, x: 300, y: 160, inputs: 0, outputs: 2, nodeCss: 'background: rgb(240, 216, 3);; color: white; text-align: center;', header: 'Node 1', content: '<i class="fas fa-bath"></i> Content 1' },
-            { id: 2, x: 500, y: 260, inputs: 1, outputs: 1, iconCss: 'color: red; font-size: 16px;', header: 'Node 2', content: '<i class="fas fa-heart icon"></i> Content 2' },
-            { id: 3, x: 500, y: 60, inputs: 1, outputs: 1, header: 'Node 3', content: '<i class="fas fa-chart-line"></i> Content 3' },
-            { id: 4, x: 800, y: 160, inputs: 2, outputs: 2, header: 'Node 4', content: '<i class="fas fa-network-wired"></i> Content 4' },
-            { id: 5, x: 1100, y: 160, inputs: 1, outputs: 0, header: 'Node 5', content: '<i class="fas fa-check-circle"></i> Content 5' },
-            { id: 6, x: 1300, y: 260, inputs: 1, outputs: 0, header: 'Node 6', content: '<i class="fas fa-exclamation-triangle"></i> Content 6' },
-        ];
+        const header = document.createElement('header');
+        header.innerHTML = `<h1>FlowOps</h1>`;
+        header.style.cssText = `
+            grid-column: 1 / -1;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        `;
+        container.appendChild(header);
 
-        const edgesConfig = [
-            { startNodeIndex: 1, endNodeIndex: 3, outputTarget: 1, inputTarget: 1 },
-            { startNodeIndex: 1, endNodeIndex: 2, outputTarget: 2, inputTarget: 1 },
-            { startNodeIndex: 3, endNodeIndex: 4, outputTarget: 1, inputTarget: 1 },
-            { startNodeIndex: 2, endNodeIndex: 4, outputTarget: 1, inputTarget: 2 },
-            { startNodeIndex: 4, endNodeIndex: 5, outputTarget: 1, inputTarget: 1 },
-            { startNodeIndex: 4, endNodeIndex: 6, outputTarget: 2, inputTarget: 1 },
-        ];
+        const sidebar = document.createElement('aside');
+        sidebar.innerHTML = `
+            <ul>
+                <li><a href="#example1">Example FlowChart 1</a></li>
+                <li><a href="#example2">Example FlowChart 2</a></li>
+                <li><a href="#example3">Example FlowChart 3</a></li>
+            </ul>
+        `;
+        sidebar.style.cssText = `
+            background-color: #f4f4f4;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            font-size: 16px;
+            line-height: 1.5;
+        `;
+        container.appendChild(sidebar);
 
-        const flowChartConfig: FlowChartConfig = {
-            nodes: nodesConfig,
-            edges: edgesConfig,
-            cssImports: ['https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css'],
-            nodeCss: 'background: rgb(30, 14, 87);; color: white; text-align: center;', 
-            headerCss: `
-                background-color: #f1f1f1;
-                color: black;
-                padding: 0px;
-                align-items: left-center;
-                border-radius: 5px 5px 0 0;
-            `,
-            contentCss: `
-                padding: 0px;
-                border-radius: 0 0 5px 5px;
-                font-family: Arial, sans-serif;
-                font-size: 14px;
-            `
+        const contentArea = document.createElement('main');
+        contentArea.style.cssText = `
+            padding: 20px;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        `;
+        container.appendChild(contentArea);
+
+        const flowCharts = {
+            example1: this.createFlowChart('', 3),
+            example2: this.createFlowChart('', 5),
+            example3: this.createFlowChart('', 2),
         };
 
-        const flowChart = new FlowChart(flowChartConfig);
-        this.appendChild(flowChart);
-
-        const addNodeButton = document.createElement('button');
-        addNodeButton.innerHTML = '<i class="fas fa-plus"></i> Add Node';
-        addNodeButton.addEventListener('click', () => {
-            flowChart.addNode({
-                id: flowChartConfig.nodes.length + 1,
-                x: 200,
-                y: 200,
-                inputs: 1,
-                outputs: 1,
-                header: 'New Node',
-                content: '<i class="fa fa-plus-circle icon"></i> New Content'
-            });
+        window.addEventListener('hashchange', () => {
+            const hash = location.hash.substring(1);
+            contentArea.innerHTML = '';
+            if (flowCharts[hash]) {
+                contentArea.appendChild(flowCharts[hash]);
+            }
         });
 
-        const exportButton = document.createElement('button');
-        exportButton.innerHTML = '<i class="fas fa-download"></i> Export Nodes & Edges';
-        exportButton.addEventListener('click', () => {
-            const exportedData = {
-                nodes: flowChartConfig.nodes.map(node => ({
-                    id: node.id,
-                    x: node.x,
-                    y: node.y,
-                    inputs: node.inputs,
-                    outputs: node.outputs,
-                    header: node.header,
-                    content: node.content
-                })),
-                edges: flowChartConfig.edges.map(edge => ({
-                    startNodeIndex: edge.startNodeIndex,
-                    endNodeIndex: edge.endNodeIndex,
-                    outputTarget: edge.outputTarget,
-                    inputTarget: edge.inputTarget
-                }))
-            };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportedData, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "flowchart.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        });
-
-        this.appendChild(addNodeButton);
-        this.appendChild(exportButton);
+        if (location.hash) {
+            const hash = location.hash.substring(1);
+            if (flowCharts[hash]) {
+                contentArea.appendChild(flowCharts[hash]);
+            }
+        } else {
+            contentArea.appendChild(flowCharts.example1);
+        }
 
         const style = document.createElement('style');
         style.textContent = `
@@ -109,6 +90,88 @@ export class App extends HTMLElement {
             }
         `;
         this.appendChild(style);
+        const addNodeButton = document.createElement('button');
+        addNodeButton.innerHTML = '<i class="fas fa-plus"></i> Add Node';
+        addNodeButton.addEventListener('click', () => {
+            const hash = location.hash.substring(1);
+
+            flowCharts[hash].addNode({
+                id: flowCharts[hash].config.nodes.length + 1,
+                x: 200,
+                y: 200,
+                inputs: 1,
+                outputs: 1,
+                header: '<i class="fas fa-circle"></i> New Node',
+                content: '<i class="fa fa-plus-circle icon"></i> New Content'
+            });
+        });
+
+        const exportButton = document.createElement('button');
+        exportButton.innerHTML = '<i class="fas fa-download"></i> Export Nodes & Edges';
+        exportButton.addEventListener('click', () => {
+            const hash = location.hash.substring(1);
+
+            const exportedData = {
+                nodes: flowCharts[hash].config.nodes.map(node => ({
+                    id: node.id,
+                    x: node.x,
+                    y: node.y,
+                    inputs: node.inputs,
+                    outputs: node.outputs,
+                    header: node.header,
+                    content: node.content
+                })),
+                edges: flowCharts[hash].config.edges.map(edge => ({
+                    startNodeIndex: edge.startNodeIndex,
+                    endNodeIndex: edge.endNodeIndex,
+                    outputTarget: edge.outputTarget,
+                    inputTarget: edge.inputTarget
+                }))
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportedData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "flowchart.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        });
+
+        sidebar.appendChild(addNodeButton);
+        sidebar.appendChild(exportButton);
+    }
+
+    createFlowChart(title, nodeCount) {
+        const nodesConfig = Array.from({ length: nodeCount }, (_, i) => ({
+            id: i + 1,
+            x: 300 + i * 200,
+            y: 160 + (i % 2 === 0 ? 100 : -100),
+            inputs: i === 0 ? 0 : 1,
+            outputs: i === nodeCount - 1 ? 0 : 1,
+            header: `<i class="fas fa-check"></i> ${title} Node ${i + 1}`,
+            content: `Content ${i + 1}`,
+        }));
+
+        const edgesConfig = nodesConfig
+            .slice(0, -1)
+            .map((node, i) => ({
+                startNodeIndex: node.id,
+                endNodeIndex: nodesConfig[i + 1].id,
+                outputTarget: 1,
+                inputTarget: 1,
+            }));
+
+        const flowChartConfig: FlowChartConfig = {
+            nodes: nodesConfig,
+            edges: edgesConfig,
+            nodeCss: 'background-color: rgb(255, 255, 255); width: 120px;',
+            headerCss: 'background-color: rgb(58, 58, 58); color: white; font-size: 14px;',
+            cssImports: ['https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css'],
+            flowCss: 'background-color: rgb(129, 129, 129);',
+        };
+
+        const flowChart = new FlowChart(flowChartConfig);
+        return flowChart;
     }
 }
 

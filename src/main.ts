@@ -1,5 +1,5 @@
-import { App } from "./app"
+import { App } from "./app";
 
-window.onload= () =>{
-    document.querySelector("#root").append(new App())
-}
+window.onload = () => {
+    document.querySelector("#root").append(new App());
+};
