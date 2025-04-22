@@ -16,19 +16,20 @@ export class App extends HTMLElement {
         header.innerHTML = `<h1>FlowOps</h1>`;
         header.style.cssText = `
             grid-column: 1 / -1;
-            background-color: #333;
+            background-color: #3f51b5;
             color: white;
-            padding: 10px;
+            padding: 16px;
             text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         `;
         container.appendChild(header);
 
         const sidebar = document.createElement('aside');
         sidebar.innerHTML = `
             <ul>
-                <li><a href="#example1">Example FlowChart 1</a></li>
-                <li><a href="#example2">Example FlowChart 2</a></li>
-                <li><a href="#example3">Example FlowChart 3</a></li>
+                <li><a href="#example1">Microservices Architecture</a></li>
+                <li><a href="#example2">Data Migration Flow</a></li>
+                <li><a href="#example3">Telecom Network Routing</a></li>
             </ul>
         `;
         sidebar.style.cssText = `
@@ -46,13 +47,15 @@ export class App extends HTMLElement {
             overflow: hidden;
             width: 100%;
             height: 100%;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         `;
         container.appendChild(contentArea);
 
         const flowCharts = {
-            example1: this.createFlowChart('', 3),
-            example2: this.createFlowChart('', 5),
-            example3: this.createFlowChart('', 2),
+            example1: this.createFlowChart('Microservices Architecture', 10),
+            example2: this.createFlowChart('Data Migration Flow', 5),
+            example3: this.createFlowChart('Telecom Network Routing', 7),
         };
 
         window.addEventListener('hashchange', () => {
@@ -80,13 +83,14 @@ export class App extends HTMLElement {
                 padding: 10px 20px;
                 font-size: 14px;
                 cursor: pointer;
-                background-color: #007bff;
+                background-color: #3f51b5;
                 color: white;
                 border: none;
-                border-radius: 5px;
+                border-radius: 4px;
+                transition: background-color 0.3s;
             }
             button:hover {
-                background-color: #0056b3;
+                background-color: #303f9f;
             }
         `;
         this.appendChild(style);
@@ -142,24 +146,30 @@ export class App extends HTMLElement {
     }
 
     createFlowChart(title, nodeCount) {
-        const nodesConfig = Array.from({ length: nodeCount }, (_, i) => ({
-            id: i + 1,
-            x: 300 + i * 200,
-            y: 160 + (i % 2 === 0 ? 100 : -100),
-            inputs: i === 0 ? 0 : 1,
-            outputs: i === nodeCount - 1 ? 0 : 1,
-            header: `<i class="fas fa-check"></i> ${title} Node ${i + 1}`,
-            content: `Content ${i + 1}`,
-        }));
+        const nodesConfig = [
+            { id: 1, x: 100, y: 200, inputs: 0, outputs: 1, header: 'Frontend 1', content: 'Frontend Service 1' },
+            { id: 2, x: 300, y: 200, inputs: 0, outputs: 1, header: 'Frontend 2', content: 'Frontend Service 2' },
+            { id: 3, x: 500, y: 200, inputs: 2, outputs: 1, header: 'API Gateway', content: 'API Gateway' },
+            { id: 4, x: 700, y: 150, inputs: 1, outputs: 1, header: 'BFF 1', content: 'Backend for Frontend 1' },
+            { id: 5, x: 700, y: 250, inputs: 1, outputs: 1, header: 'BFF 2', content: 'Backend for Frontend 2' },
+            { id: 6, x: 900, y: 100, inputs: 1, outputs: 0, header: 'Microservice 1', content: 'Microservice 1' },
+            { id: 7, x: 900, y: 150, inputs: 1, outputs: 0, header: 'Microservice 2', content: 'Microservice 2' },
+            { id: 8, x: 900, y: 200, inputs: 1, outputs: 0, header: 'Microservice 3', content: 'Microservice 3' },
+            { id: 9, x: 900, y: 250, inputs: 1, outputs: 0, header: 'Microservice 4', content: 'Microservice 4' },
+            { id: 10, x: 900, y: 300, inputs: 1, outputs: 0, header: 'Microservice 5', content: 'Microservice 5' },
+        ];
 
-        const edgesConfig = nodesConfig
-            .slice(0, -1)
-            .map((node, i) => ({
-                startNodeIndex: node.id,
-                endNodeIndex: nodesConfig[i + 1].id,
-                outputTarget: 1,
-                inputTarget: 1,
-            }));
+        const edgesConfig = [
+            { startNodeIndex: 1, endNodeIndex: 3, outputTarget: 1, inputTarget: 1 },
+            { startNodeIndex: 2, endNodeIndex: 3, outputTarget: 1, inputTarget: 2 },
+            { startNodeIndex: 3, endNodeIndex: 4, outputTarget: 1, inputTarget: 1 },
+            { startNodeIndex: 3, endNodeIndex: 5, outputTarget: 1, inputTarget: 1 },
+            { startNodeIndex: 4, endNodeIndex: 6, outputTarget: 1, inputTarget: 1 },
+            { startNodeIndex: 4, endNodeIndex: 7, outputTarget: 1, inputTarget: 1 },
+            { startNodeIndex: 5, endNodeIndex: 8, outputTarget: 1, inputTarget: 1 },
+            { startNodeIndex: 5, endNodeIndex: 9, outputTarget: 1, inputTarget: 1 },
+            { startNodeIndex: 5, endNodeIndex: 10, outputTarget: 1, inputTarget: 1 },
+        ];
 
         const flowChartConfig: FlowChartConfig = {
             nodes: nodesConfig,
