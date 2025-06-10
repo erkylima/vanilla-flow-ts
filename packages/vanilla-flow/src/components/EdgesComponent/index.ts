@@ -12,6 +12,7 @@ interface Edge {
     inputTarget: number;
     outputTarget: number;
     edgeIndex?: string;
+    data?: any;
 }
 
 interface EdgeExchange {

@@ -3,13 +3,15 @@ import { EdgesComponent, EdgeProps } from "../EdgesComponent/index";
 
 export interface FlowChartConfig {
     nodes: NodeProps[];
-    edges: { startNodeIndex: number; endNodeIndex: number; inputTarget: number; outputTarget: number; edgeIndex?: string; }[];
+    edges: { startNodeIndex: number; endNodeIndex: number; inputTarget: number; outputTarget: number; edgeIndex?: string; data?: any }[];
     edgeCss?: CSSStyleSheet;
     flowCss?: string;
     cssImports?: string[];
     nodeCss?: string;
     headerCss?: string;
     contentCss?: string;
+    onNodeClick?: (node: NodeComponent) => void;
+    onEdgeClick?: (edge: { startNodeIndex: number; endNodeIndex: number; inputTarget: number; outputTarget: number; edgeIndex?: string; data?: any }) => void;
 }
 
 export class FlowChart extends HTMLElement {
@@ -25,20 +27,33 @@ export class FlowChart extends HTMLElement {
     private startY: number = 0;
     private isDraggingNode: boolean = false;
     private config: FlowChartConfig;
+
+    public onNodeClick?: (node: NodeComponent) => void;
+    public onEdgeClick?: (edge: { startNodeIndex: number; endNodeIndex: number; inputTarget: number; outputTarget: number; edgeIndex?: string; data?: any }) => void;
+
+    // Touch state for panning
+    private isTouchPanning: boolean = false;
+    private touchStartX: number = 0;
+    private touchStartY: number = 0;
+
     constructor(config: FlowChartConfig) {
         super();
-        this.config = config;    
+        this.config = config;
+        this.onNodeClick = config.onNodeClick;
+        this.onEdgeClick = config.onEdgeClick;
         this.render();
         this.addEventListener('contextmenu', (e) => {
             e.preventDefault();
         });
         this.initializeNodes(config.nodes, config.cssImports, config.nodeCss, config.headerCss, config.contentCss);
         this.initializeEdges(config.edges);
+        this.attachNodeClickListeners();
+        this.attachEdgeClickListeners();
     }
 
-    private render() {   
+    private render() {
         this.innerHTML = `
-        <style>                
+        <style>
             .wrapper {
                 display: block;
                 overflow: hidden;
@@ -46,7 +61,7 @@ export class FlowChart extends HTMLElement {
                 height: 100%;
                 position: relative;
                 border: 1px solid #ccc;
-                cursor: grab;                   
+                cursor: grab;
                 background-size: 30px 30px;
                 background-image: radial-gradient(circle, #b8b8b8bf 1px, rgba(0, 0, 0, 0) 1px);
                 ${this.config?.flowCss || ''}
@@ -60,7 +75,6 @@ export class FlowChart extends HTMLElement {
                 position: relative;
                 top: 0;
                 left: 0;
-                
             }
             .grabbing {
                 cursor: grabbing;
@@ -69,14 +83,19 @@ export class FlowChart extends HTMLElement {
         <div class="wrapper" style="width: 98vw; height: 80vh;">
             <div class="board"></div>
         </div>
-        `;        
-        
+        `;
+
         this.board = this.querySelector('.board') as HTMLDivElement;
         this.wrapper = this.querySelector('.wrapper') as HTMLDivElement;
         this.wrapper.addEventListener('mousedown', this.onMouseDown.bind(this));
         window.addEventListener('mouseup', this.onMouseUp.bind(this));
         window.addEventListener('mousemove', this.onMouseMove.bind(this));
         this.wrapper.addEventListener('wheel', this.onMouseWheel.bind(this));
+
+        // Touch events for panning
+        this.wrapper.addEventListener('touchstart', this.onTouchStart.bind(this), { passive: false });
+        this.wrapper.addEventListener('touchmove', this.onTouchMove.bind(this), { passive: false });
+        this.wrapper.addEventListener('touchend', this.onTouchEnd.bind(this), { passive: false });
     }
 
     private initializeNodes(nodesConfig: NodeProps[], cssImports?: string[], nodeCss?: string, headerCss?: string, contentCss?: string) {
@@ -85,8 +104,7 @@ export class FlowChart extends HTMLElement {
             link.rel = 'stylesheet';
             link.href = cssImport;
             document.head.appendChild(link);
-        }
-        );
+        });
         nodesConfig.forEach(nodeConfig => {
             nodeConfig.flowChart = this;
             nodeConfig.cssImports = cssImports;
@@ -96,6 +114,38 @@ export class FlowChart extends HTMLElement {
             const node = new NodeComponent(nodeConfig);
             this.nodes.push(node);
             this.board?.appendChild(node);
+
+            // Touch events for node dragging
+            node.addEventListener('touchstart', (e: TouchEvent) => {
+                if (e.touches.length === 1) {
+                    e.stopPropagation();
+                    this.isDraggingNode = true;
+                    node.dispatchEvent(new CustomEvent('dragstart', { bubbles: true }));
+                    node.__touchDragStartX = e.touches[0].clientX;
+                    node.__touchDragStartY = e.touches[0].clientY;
+                    node.__origX = node.props.x;
+                    node.__origY = node.props.y;
+                }
+            }, { passive: false });
+
+            node.addEventListener('touchmove', (e: TouchEvent) => {
+                if (this.isDraggingNode && e.touches.length === 1) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const dx = e.touches[0].clientX - node.__touchDragStartX;
+                    const dy = e.touches[0].clientY - node.__touchDragStartY;
+                    node.setPosition(node.__origX + dx / this.scale, node.__origY + dy / this.scale);
+                    this.edgesComponent?.updateEdgePositions();
+                }
+            }, { passive: false });
+
+            node.addEventListener('touchend', (e: TouchEvent) => {
+                if (this.isDraggingNode) {
+                    e.stopPropagation();
+                    this.isDraggingNode = false;
+                    node.dispatchEvent(new CustomEvent('dragend', { bubbles: true }));
+                }
+            }, { passive: false });
         });
     }
 
@@ -120,7 +170,7 @@ export class FlowChart extends HTMLElement {
 
     private onMouseWheel(event: WheelEvent): void {
         event.preventDefault();
-    
+
         const { offsetX, offsetY, deltaY } = event;
         const zoomFactor = 0.1;
         const newScale = this.scale * (deltaY > 0 ? (1 - zoomFactor) : (1 + zoomFactor));
@@ -129,7 +179,7 @@ export class FlowChart extends HTMLElement {
 
         const originDeltaX = offsetX - this.translateX;
         const originDeltaY = offsetY - this.translateY;
-        
+
         this.translateX -= originDeltaX * (newScale / this.scale - 1);
         this.translateY -= originDeltaY * (newScale / this.scale - 1);
 
@@ -169,10 +219,43 @@ export class FlowChart extends HTMLElement {
         this.isDraggingNode = false;
     }
 
+    private onTouchStart(event: TouchEvent): void {
+        if (event.touches.length === 2) {
+            return;
+        }
+        if (event.touches.length === 1) {
+            this.isTouchPanning = true;
+            this.touchStartX = event.touches[0].clientX;
+            this.touchStartY = event.touches[0].clientY;
+            this.board?.classList.add('grabbing');
+            event.stopPropagation();
+        }
+    }
+
+    private onTouchMove(event: TouchEvent): void {
+        if (!this.isTouchPanning || this.isDraggingNode || event.touches.length !== 1) return;
+        event.preventDefault();
+        const deltaX = event.touches[0].clientX - this.touchStartX;
+        const deltaY = event.touches[0].clientY - this.touchStartY;
+        this.touchStartX = event.touches[0].clientX;
+        this.touchStartY = event.touches[0].clientY;
+
+        this.translateX += deltaX;
+        this.translateY += deltaY;
+
+        this.updateTransform();
+    }
+
+    private onTouchEnd(event: TouchEvent): void {
+        this.isTouchPanning = false;
+        this.board?.classList.remove('grabbing');
+        this.isDraggingNode = false;
+    }
+
     updateTransform() {
         this.board.style.transform = `translate(${this.translateX}px, ${this.translateY}px) scale(${this.scale})`;
         this.wrapper.style.backgroundPositionX = this.translateX + "px";
-        this.wrapper.style.backgroundPositionY = this.translateY + "px";  
+        this.wrapper.style.backgroundPositionY = this.translateY + "px";
         this.nodes.forEach(node => { node.setPosition(node.props.x, node.props.y); });
     }
 
@@ -184,10 +267,46 @@ export class FlowChart extends HTMLElement {
         this.nodes.push(node);
         this.board.appendChild(node);
         this.edgesComponent?.updateEdgePositions();
+        this.attachNodeClickListeners();
     }
 
     public getConfig(): FlowChartConfig {
         return this.config;
+    }
+
+    public getNodeElements(): HTMLElement[] {
+        return this.nodes;
+    }
+
+    public getEdgeElements(): HTMLElement[] {
+        if (!this.edgesComponent) return [];
+        // @ts-ignore
+        return this.edgesComponent.edgeElements.map(e => e.elementContainer);
+    }
+
+    private attachNodeClickListeners() {
+        this.nodes.forEach((node, idx) => {
+            node.ondblclick = (e: MouseEvent) => {
+                e.stopPropagation();
+                if (this.onNodeClick) {
+                    this.onNodeClick(node);
+                }
+            };
+        });
+    }
+
+    private attachEdgeClickListeners() {
+        if (!this.edgesComponent) return;
+        // @ts-ignore
+        this.edgesComponent.edgeElements.forEach((edgeElement, idx) => {
+            edgeElement.elementContainer.onclick = (e: MouseEvent) => {
+                e.stopPropagation();
+                if (this.onEdgeClick) {
+                    const edgeConfig = this.config.edges[idx];
+                    this.onEdgeClick(edgeConfig);
+                }
+            };
+        });
     }
 }
 

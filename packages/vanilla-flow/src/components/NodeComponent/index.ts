@@ -26,6 +26,10 @@ export class NodeComponent extends HTMLElement {
     private initialY: number = 0;
     private initialNodeX: number = 0;
     private initialNodeY: number = 0;
+    public __touchDragStartX: number = 0;
+    public __touchDragStartY: number = 0;
+    public __origX: number = 0;
+    public __origY: number = 0;
     public inputsElement: Array<HTMLElement> = new Array<HTMLElement>();
     public outputsElement: Array<HTMLElement> = new Array<HTMLElement>();
     private isDragging: boolean = false;
@@ -113,8 +117,6 @@ export class NodeComponent extends HTMLElement {
                     align-content: center;
                     align-items: center;
                     ${this.props.nodeCss || ''}
-
-
                 }
                 :host(:hover){
                     box-shadow: 2px 2px 12px -6px rgba(0, 0, 0, 0.75);
@@ -123,7 +125,6 @@ export class NodeComponent extends HTMLElement {
                     border: 1px solid #e38c29;
                     z-index: 100;
                 }
-
                 .icon {
                     ${this.props.iconCss || ''}
                 }
