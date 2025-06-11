@@ -5,6 +5,8 @@ import { MicrofrontendsPage } from './pages/microfrontends-composition';
 
 export class App extends HTMLElement {
   connectedCallback() {
+    
+
     const container = document.createElement('div');
     container.style.cssText = `
       display: grid;
@@ -15,7 +17,6 @@ export class App extends HTMLElement {
     `;
     this.appendChild(container);
 
-    // Header
     const header = document.createElement('header');
     header.innerHTML = '<h1>FlowOps</h1>';
     header.style.cssText = `
@@ -28,7 +29,6 @@ export class App extends HTMLElement {
     `;
     container.appendChild(header);
 
-    // Sidebar navigation
     const sidebar = document.createElement('aside');
     sidebar.innerHTML = `
       <ul class="menu">
@@ -52,7 +52,6 @@ export class App extends HTMLElement {
     `;
     container.appendChild(sidebar);
 
-    // Dropdown styles
     const style = document.createElement('style');
     style.textContent = `
       .dropdown-toggle {
@@ -86,14 +85,12 @@ export class App extends HTMLElement {
     `;
     sidebar.appendChild(style);
 
-    // Dropdown toggle event
     const dropdown = sidebar.querySelector('.dropdown') as HTMLElement;
     const toggleBtn = sidebar.querySelector('.dropdown-toggle') as HTMLElement;
     toggleBtn.addEventListener('click', () => {
       dropdown.classList.toggle('open');
     });
 
-    // Content area
     const contentArea = document.createElement('main');
     contentArea.style.cssText = `
       padding: 20px;

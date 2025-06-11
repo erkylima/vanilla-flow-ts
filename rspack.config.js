@@ -29,7 +29,7 @@ module.exports = {
 				localIdentName: '[uniqueName]-[id]-[local]',
 			},
 			'asset/resource': {
-				emit: false,
+				emit: true,
 			},
 	  	},
 	  	rules: [
@@ -38,7 +38,15 @@ module.exports = {
 			parser: {
 				namedExports: false,
 		  	},
+			
 		  	type: 'css/module',
+			},
+			{
+        		test: /\.(png|jpe?g|gif|svg)$/i,
+				type: 'asset/resource', // ou 'asset/inline', 'asset', conforme necessidade
+				generator: {
+				filename: 'images/[hash][ext][query]', // pasta de saída
+				},
 			},
 			{
 				test: /\.ts$/,

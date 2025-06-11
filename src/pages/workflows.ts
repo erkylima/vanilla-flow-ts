@@ -1,4 +1,6 @@
 import { FlowChart, FlowChartConfig } from '../../packages/vanilla-flow/src/index';
+import { styleAwsNode } from '../utils/node-factory';
+import { NodeProps } from '../interfaces/node-props';
 
 export class WorkflowsPage extends HTMLElement {
   connectedCallback() {
@@ -26,13 +28,15 @@ export class WorkflowsPage extends HTMLElement {
   }
 
   private createMicroservicesWorkflow(): HTMLElement {
-    const nodesConfig = [
+    const baseNodes: NodeProps[] = [
       { id: 1, x: 100, y: 200, inputs: 0, outputs: 1, header: 'API Gateway', content: 'AWS API Gateway' },
       { id: 2, x: 300, y: 200, inputs: 1, outputs: 1, header: 'BFF Service', content: 'AWS Lambda' },
       { id: 3, x: 500, y: 150, inputs: 1, outputs: 1, header: 'Auth Service', content: 'JWT Auth' },
       { id: 4, x: 500, y: 250, inputs: 1, outputs: 1, header: 'User Service', content: 'REST API' },
       { id: 5, x: 700, y: 200, inputs: 2, outputs: 0, header: 'Frontend', content: 'Micro Frontend' }
     ];
+    const nodesConfig = baseNodes.map(styleAwsNode);
+
     const edgesConfig = [
       { startNodeIndex: 1, endNodeIndex: 2, outputTarget: 1, inputTarget: 1 },
       { startNodeIndex: 2, endNodeIndex: 3, outputTarget: 1, inputTarget: 1 },
@@ -40,10 +44,11 @@ export class WorkflowsPage extends HTMLElement {
       { startNodeIndex: 3, endNodeIndex: 5, outputTarget: 1, inputTarget: 1 },
       { startNodeIndex: 4, endNodeIndex: 5, outputTarget: 1, inputTarget: 2 }
     ];
+
     const config: FlowChartConfig = {
       nodes: nodesConfig,
       edges: edgesConfig,
-      nodeCss: 'background-color: #e8f0fe; width: 140px;',
+      nodeCss: 'background-color: #e8f0fe; width: 140px; border-radius: 4px;',
       headerCss: 'background-color: #1976d2; color: white; font-size: 13px;',
       cssImports: [],
       flowCss: 'background-color: #f5f5f5;'
@@ -52,23 +57,26 @@ export class WorkflowsPage extends HTMLElement {
   }
 
   private createBatchProcessingWorkflow(): HTMLElement {
-    const nodesConfig = [
+    const baseNodes: NodeProps[] = [
       { id: 1, x: 100, y: 200, inputs: 0, outputs: 1, header: 'S3 Bucket', content: 'AWS S3 (Raw Data)' },
       { id: 2, x: 300, y: 200, inputs: 1, outputs: 1, header: 'ETL Lambda', content: 'AWS Lambda ETL Job' },
       { id: 3, x: 500, y: 200, inputs: 1, outputs: 1, header: 'Batch Worker', content: 'AWS Batch' },
       { id: 4, x: 700, y: 200, inputs: 1, outputs: 1, header: 'Redshift', content: 'AWS Redshift' },
       { id: 5, x: 900, y: 200, inputs: 1, outputs: 0, header: 'Notification', content: 'SNS Topic' }
     ];
+    const nodesConfig = baseNodes.map(styleAwsNode);
+
     const edgesConfig = [
       { startNodeIndex: 1, endNodeIndex: 2, outputTarget: 1, inputTarget: 1 },
       { startNodeIndex: 2, endNodeIndex: 3, outputTarget: 1, inputTarget: 1 },
       { startNodeIndex: 3, endNodeIndex: 4, outputTarget: 1, inputTarget: 1 },
       { startNodeIndex: 4, endNodeIndex: 5, outputTarget: 1, inputTarget: 1 }
     ];
+
     const config: FlowChartConfig = {
       nodes: nodesConfig,
       edges: edgesConfig,
-      nodeCss: 'background-color: #fff3e0; width: 140px;',
+      nodeCss: 'background-color: #fff3e0; width: 140px; border-radius: 4px;',
       headerCss: 'background-color: #fb8c00; color: white; font-size: 13px;',
       cssImports: [],
       flowCss: 'background-color: #fafafa;'
@@ -77,23 +85,26 @@ export class WorkflowsPage extends HTMLElement {
   }
 
   private createMicroFrontendsWorkflow(): HTMLElement {
-    const nodesConfig = [
+    const baseNodes: NodeProps[] = [
       { id: 1, x: 100, y: 200, inputs: 0, outputs: 1, header: 'API Gateway', content: 'AWS API Gateway' },
       { id: 2, x: 300, y: 100, inputs: 1, outputs: 1, header: 'Service A', content: 'Products API' },
       { id: 3, x: 300, y: 300, inputs: 1, outputs: 1, header: 'Service B', content: 'Cart API' },
       { id: 4, x: 500, y: 100, inputs: 1, outputs: 0, header: 'Frontend A', content: 'Micro Frontend A' },
       { id: 5, x: 500, y: 300, inputs: 1, outputs: 0, header: 'Frontend B', content: 'Micro Frontend B' }
     ];
+    const nodesConfig = baseNodes.map(styleAwsNode);
+
     const edgesConfig = [
       { startNodeIndex: 1, endNodeIndex: 2, outputTarget: 1, inputTarget: 1 },
       { startNodeIndex: 1, endNodeIndex: 3, outputTarget: 1, inputTarget: 1 },
       { startNodeIndex: 2, endNodeIndex: 4, outputTarget: 1, inputTarget: 1 },
       { startNodeIndex: 3, endNodeIndex: 5, outputTarget: 1, inputTarget: 1 }
     ];
+
     const config: FlowChartConfig = {
       nodes: nodesConfig,
       edges: edgesConfig,
-      nodeCss: 'background-color: #e8f5e9; width: 140px;',
+      nodeCss: 'background-color: #e8f5e9; width: 140px; border-radius: 4px;',
       headerCss: 'background-color: #43a047; color: white; font-size: 13px;',
       cssImports: [],
       flowCss: 'background-color: #f1f8e9;'

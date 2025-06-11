@@ -13,6 +13,8 @@ export interface NodeProps {
     cssImports?: string[];
     iconCss?: string;
     nodeCss?: string;
+    nodeHoverCss?: string;
+    nodeActiveCss?: string;
     headerCss?: string;
     contentCss?: string;
     data?: Record<string, any>; // Added to store node information
@@ -120,10 +122,13 @@ export class NodeComponent extends HTMLElement {
                 }
                 :host(:hover){
                     box-shadow: 2px 2px 12px -6px rgba(0, 0, 0, 0.75);
+                    ${this.props.nodeHoverCss || ''}
+
                 }
                 :host(.active) {
                     border: 1px solid #e38c29;
                     z-index: 100;
+                    ${this.props.nodeActiveCss || ''}
                 }
                 .icon {
                     ${this.props.iconCss || ''}
@@ -178,8 +183,8 @@ export class NodeComponent extends HTMLElement {
                 }
             </style>
             <div class="inputs"></div>
-            <div class="header">${this.props.header || 'Header'}</div>
-            <div class="content">${this.props.content || 'Content'}</div>
+            <div class="header">${this.props.header || ''}</div>
+            <div class="content">${this.props.content || ''}</div>
             <div class="outputs"></div>
         `;
     }
