@@ -31,11 +31,16 @@ export class App extends HTMLElement {
     // Sidebar navigation
     const sidebar = document.createElement('aside');
     sidebar.innerHTML = `
-      <ul>
+      <ul class="menu">
         <li><a href="#home">Home</a></li>
-        <li><a href="#microservices">Arquitetura de Microsserviços AWS</a></li>
-        <li><a href="#batch">Processamento Batch com Workers</a></li>
-        <li><a href="#microfrontends">Composição de Micro Frontends</a></li>
+        <li class="dropdown">
+          <span class="dropdown-toggle">Workflows ▼</span>
+          <ul class="dropdown-menu">
+            <li><a href="#microservices">Arquitetura de Microsserviços AWS</a></li>
+            <li><a href="#batch">Processamento Batch com Workers</a></li>
+            <li><a href="#microfrontends">Composição de Micro Frontends</a></li>
+          </ul>
+        </li>
       </ul>
     `;
     sidebar.style.cssText = `
@@ -46,6 +51,47 @@ export class App extends HTMLElement {
       line-height: 1.5;
     `;
     container.appendChild(sidebar);
+
+    // Dropdown styles
+    const style = document.createElement('style');
+    style.textContent = `
+      .dropdown-toggle {
+        cursor: pointer;
+        user-select: none;
+      }
+      .dropdown-menu {
+        list-style: none;
+        padding-left: 15px;
+        margin: 5px 0 0;
+        display: none;
+      }
+      .dropdown.open .dropdown-menu {
+        display: block;
+      }
+      .dropdown-menu li {
+        margin-bottom: 5px;
+      }
+      .menu, .menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .menu li {
+        margin-bottom: 10px;
+      }
+      .menu a {
+        text-decoration: none;
+        color: inherit;
+      }
+    `;
+    sidebar.appendChild(style);
+
+    // Dropdown toggle event
+    const dropdown = sidebar.querySelector('.dropdown') as HTMLElement;
+    const toggleBtn = sidebar.querySelector('.dropdown-toggle') as HTMLElement;
+    toggleBtn.addEventListener('click', () => {
+      dropdown.classList.toggle('open');
+    });
 
     // Content area
     const contentArea = document.createElement('main');
